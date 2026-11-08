@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Monitoring Asrama</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--ink:#1e293b;--mut:#64748b;--line:#e2e8f0;--pri:#2563eb;--pri2:#1d4ed8;--pri3:#1e40af;--soft:#eff6ff;--bad:#e11d48;--warn:#f59e0b;--on:#fff;--ky:#f59e0b;--kyb:#fffbeb;--hj:#10b981;--hjb:#ecfdf5;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--pri2);color:#fff;position:sticky;top:0;z-index:30;box-shadow:0 2px 6px #0003}
+.hd{max-width:1024px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.br{display:flex;align-items:center;gap:8px}header h1{margin:0;font-size:1.1rem}
+.hr{display:flex;gap:8px;align-items:center;font-size:12px}#st{font-size:11px;color:#dbeafe}
+.hb,header select{background:var(--pri3);color:#fff;border:1px solid #3b82f6;border-radius:8px;padding:6px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+header select option{color:#111;background:#fff}
+.dnav{display:none;background:#1e40afe6;border-top:1px solid #2563eb80}
+.dn{max-width:1024px;margin:0 auto;display:flex;gap:4px;padding:0 16px}
+.dn button{background:none;border:0;border-bottom:2px solid transparent;color:#bfdbfe;padding:10px 16px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;gap:8px;align-items:center}
+.dn button.on{color:#fff;border-bottom-color:#fff}
+#bnav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 -2px 8px #0000001a}
+#bnav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;color:#94a3b8;font:inherit;font-size:10px;font-weight:600;cursor:pointer}
+#bnav .ic{font-size:18px;line-height:1}.dn .ic{font-size:15px}#bnav button.on{color:var(--pri)}
+@media(min-width:768px){.dnav{display:block}#bnav{display:none}}
+@media(max-width:480px){#abtn .tx{display:none}}
+main{max-width:1024px;margin:0 auto;padding:16px 16px 8px}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:8px 14px calc(130px + env(safe-area-inset-bottom,0px))}footer a{color:var(--pri)}
+@media(min-width:768px){footer{padding-bottom:90px}}
+h2{margin:4px 0 10px;font-size:1.125rem}h3{margin:14px 0 8px;font-size:.9rem}.h2s{margin:2px 0 0;font-size:1rem}
+.sm{font-size:12px;margin:0}.card>p.mut{margin:0}.mut{color:var(--mut);font-size:12px}
+.rt{background:linear-gradient(90deg,var(--pri2),var(--pri));color:#fff;border-radius:12px;padding:16px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-bottom:12px}
+.rt .sm{color:#dbeafe;font-weight:500}.rt h2{font-size:1rem;margin:2px 0 0}.rtr{text-align:right}
+.clock{font:700 1.5rem ui-monospace,Consolas,monospace;letter-spacing:.05em;margin:2px 0 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px #0000000d}
+.card.ky{background:var(--kyb);border-color:#fde68a}.card.hj{background:var(--hjb);border-color:#a7f3d0}
+.card.ky .mut{color:#b45309;font-weight:600}.card.hj .mut{color:#047857;font-weight:600}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.g3 .card{margin:0;padding:12px}
+.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}@media(min-width:768px){.g4{grid-template-columns:repeat(4,1fr)}}
+.big{font-size:1.5rem;font-weight:700}.g3 .mut{font-size:11px}
+.bn,.tip{border-left:4px solid var(--pri);background:var(--soft);color:#1e3a8a;padding:12px 14px;border-radius:0 12px 12px 0;font-size:12px;margin-bottom:12px}
+.bn.red{border-color:var(--bad);background:#fff1f2;color:#9f1239}.bn.ok{border-color:var(--hj);background:var(--hjb);color:#065f46}
+.tw{background:#fff;border:1px solid var(--line);border-radius:12px;overflow-x:auto;margin-bottom:12px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{background:var(--soft);color:#1e3a8a;text-align:left;padding:12px;font-weight:700;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#334155}tr:last-child td{border-bottom:0}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;min-width:70px}.bar i{display:block;height:100%;background:var(--pri)}
+.pill{display:inline-block;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap}.pill.g{background:var(--hjb);color:#047857}.pill.r{background:#fff1f2;color:#be123c}.pill.y{background:var(--kyb);color:#92400e}.pill.b{background:#dbeafe;color:#1d4ed8}.pill.c{background:#e7d3b8;color:#6b4423}.pill.n{background:#f1f5f9;color:#475569}details.card>summary{display:flex;flex-wrap:wrap;gap:6px;align-items:center}details.card>summary b{margin-right:4px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px}
+label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:4px}
+input,select,textarea{font:inherit;font-size:13px;color:var(--ink);background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;min-width:0}
+:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.btn.pri{background:var(--pri);color:#fff;border-color:var(--pri)}.btn.pri:hover{background:var(--pri2)}
+.btn.sec{background:var(--soft);color:var(--pri3);border-color:#93c5fd}.btn.del{color:var(--bad)}
+.stu{display:grid;gap:8px}.stu .nm,.nm{font-weight:700}.stu .mt{color:var(--mut);font-size:12px}
+.sts{display:grid;grid-template-columns:repeat(auto-fit,minmax(58px,1fr));gap:6px}
+.st{width:100%;border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:6px 2px;font:inherit;font-size:11px;cursor:pointer;opacity:.6}
+.st b{display:block;font-size:1.4rem;font-weight:400;line-height:1.2}
+.st.on{opacity:1;border-color:var(--pri);background:var(--soft);font-weight:700}.st.on.bad{border-color:var(--bad);background:#fff1f2}.st.on.mid{border-color:var(--warn);background:var(--kyb)}
+.stu input{width:100%}
+.fab{position:fixed;left:16px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:45;background:var(--pri);color:#fff;border:1px solid #60a5fa;border-radius:999px;padding:11px 18px;font:inherit;font-size:13px;font-weight:700;box-shadow:0 4px 14px #0004;cursor:pointer}
+@media(min-width:768px){.fab{bottom:20px}}
+.ov{position:fixed;inset:0;background:#0009;display:none;z-index:60;align-items:flex-end;justify-content:center}.ov.on{display:flex}
+.md{background:var(--bg);width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;border-radius:16px 16px 0 0;box-shadow:0 10px 30px #0006}
+@media(min-width:768px){.ov{align-items:center}.md{border-radius:16px}}
+.mh{flex:none;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#fff;border-bottom:1px solid var(--line);font-size:1rem}
+.mh button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--mut);cursor:pointer}
+#mn{display:flex;flex-wrap:wrap;flex:none;gap:6px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line)}
+#mn button{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font:inherit;font-size:12px;font-weight:600;color:var(--mut);cursor:pointer;white-space:nowrap}
+#mn button.on{color:#fff;background:var(--pri);border-color:var(--pri)}
+#mb,#ab{padding:16px;overflow-y:auto;flex:1 1 auto;min-height:0}
+.toast{position:fixed;left:50%;bottom:calc(130px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600;display:none;z-index:99;max-width:90vw;text-align:center}
+.empty{padding:18px;text-align:center;color:var(--mut)}
+.login{max-width:360px;margin:30px auto}.err{color:var(--bad);font-weight:600;min-height:1.4em}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g2 p{margin:0}
+.chk{display:flex;flex-direction:row;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:6px;cursor:pointer;color:var(--ink);font-size:13px}
+.chk input{width:20px;height:20px;flex:none}.chk .cn{flex:1;display:flex;flex-direction:column}.chk em{font-style:normal;color:var(--mut);font-size:12px}
+.chk .cv{font-weight:700;color:var(--pri2);background:var(--soft);border-radius:8px;padding:2px 9px}
+.chk:has(input:checked){border-color:#10b981;background:var(--hjb)}
+details.card summary{cursor:pointer;font-weight:600}
+.chk .seg{display:flex;gap:4px;flex:none}
+.seg button{min-width:38px;height:36px;border:1px solid var(--line);background:#fff;border-radius:8px;font:inherit;font-weight:700;cursor:pointer;color:var(--mut)}
+.seg button.on{color:#fff}.seg button.on.z{background:#64748b;border-color:#64748b}.seg button.on.p{background:#f59e0b;border-color:#f59e0b}.seg button.on.f{background:#10b981;border-color:#10b981}
+.chk.full{border-color:#10b981;background:var(--hjb)}
+.bn.yel{border-color:var(--ky);background:var(--kyb);color:#92400e}
+.kgt{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.kg .btn{padding:6px 10px}.btn:disabled{opacity:.4;cursor:default}
+.savebar{position:sticky;bottom:-16px;margin:14px -16px -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid var(--line);box-shadow:0 -4px 12px #0000001a;z-index:2}
+.savebar .btn{width:100%;padding:13px;font-size:15px;box-shadow:0 2px 8px #2563eb55}
+.adm{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#ecfdf5;border-bottom:1px solid #a7f3d0;font-size:12px;color:#065f46}.adm[hidden]{display:none}.adm .btn{padding:4px 10px}
+</style>
+</head>
+<body>
+<header>
+ <div class="hd"><div class="br"><span style="font-size:1.5rem">🏠</span><h1>Monitoring Asrama</h1></div>
+  <div class="hr"><button class="hb" id="abtn"><span aria-hidden="true">ℹ️</span> <span class="tx">Tentang</span></button>
+   <select id="lang" aria-label="Bahasa"><option value="id">🇮🇩 Indonesia</option><option value="en">🇬🇧 English</option><option value="tr">🇹🇷 Türkçe</option></select>
+   <span id="st"></span><button class="hb" id="out" hidden>Keluar</button></div></div>
+ <div class="dnav"><nav id="nav" class="dn"></nav></div>
+</header>
+<main><section id="view"></section></main>
+<footer id="ft"></footer>
+<nav id="bnav"></nav>
+<button class="fab" id="fab" hidden>＋ <span>Input Data</span></button>
+<div class="ov" id="ov"><div class="md"><div class="mh"><b>Input Data</b><button id="mx" aria-label="Tutup">✕</button></div><nav id="mn"></nav><div id="admbar" class="adm" hidden><span>🔓 Mode admin</span> <button class="btn" id="adl">Kunci kembali</button></div><div id="mb"></div></div></div>
+<div class="ov" id="abt"><div class="md"><div class="mh"><b>Tentang Aplikasi</b><button id="ax" aria-label="Tutup">✕</button></div><div id="ab"></div></div></div>
+<div class="toast" id="toast"></div>
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const DEF_ACTS=[{nama:'Subuh',jenis:'sholat',shift:'pagi',auto:'Tidak sholat berjamaah'},{nama:'Tadarus Pagi',jenis:'biasa',shift:'pagi',auto:'Tidak mengikuti program tadarus'},{nama:'Magrib',jenis:'sholat',shift:'malam',auto:'Tidak sholat berjamaah'},{nama:'Isya',jenis:'sholat',shift:'malam',auto:'Tidak sholat berjamaah'},{nama:'Tadarus Magrib',jenis:'biasa',shift:'malam',auto:'Tidak mengikuti program tadarus'},{nama:'Belajar Mandiri',jenis:'biasa',shift:'malam',auto:'Tidak mengikuti belajar mandiri'},{nama:'Absensi Malam',jenis:'biasa',shift:'malam',auto:''}];
+const actsList=()=>db.acts&&db.acts.length?db.acts:DEF_ACTS.map((a,i)=>({id:'d'+i,urut:i,...a}));
+const ACTN=()=>actsList().map(a=>a.nama);
+const actOf=n=>actsList().find(a=>a.nama===n)||null;
+const isPray=n=>{const a=actOf(n);return !!a&&a.jenis==='sholat'};
+const isMorning=n=>{const a=actOf(n);return !!a&&a.shift==='pagi'};
+const ST={pray:[['Hadir','🕌','ok'],['Telat','⏰','mid'],['Izin','📝','mid'],['Sakit','🤒','mid'],['Alpa','❌','bad']],
+ other:[['Hadir','✅','ok'],['Izin','📝','mid'],['Sakit','🤒','mid'],['Alpa','❌','bad']],
+ two:[['Hadir','✅','ok'],['Alpa','❌','bad']],
+ late:[['Hadir','✅','ok'],['Telat','⏰','mid'],['Izin','📝','mid'],['Sakit','🤒','mid'],['Alpa','❌','bad']]};
+const stSet0=n=>{if(isPray(n))return ST.pray;const a=actOf(n);if(a&&a.jenis==='telat')return ST.late;return a&&(a.jenis==='dua'||a.nama==='Absensi Malam')?ST.two:ST.other};
+const stSet=n=>{const r=stSet0(n);if(n==='Pengumpulan HP Pagi'&&!r.some(x=>x[0]==='Izin')){const c=r.slice();c.splice(c.length-1,0,['Izin','📝','mid']);return c}return r};
+const GOOD=['Jamaah','Masbuk','Hadir'];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LS=(k,v)=>{try{if(v===undefined)return JSON.parse(localStorage.getItem(k));if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}};
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2200)};
+
+/* ---------- bahasa & kredit ---------- */
+const CREDIT={nama:'Faidhil',tahun:2026};
+const APP_VER='1.0';
+const LANGS={id:'Indonesia',en:'English',tr:'Türkçe'};
+let lang=LS('lang');if(!LANGS[lang])lang='id';
+const D=new Map([["Hanya admin", ["Admins only", "Yalnızca yönetici"]],["Tab ini hanya bisa diisi oleh admin. Masukkan kode admin untuk membuka.", ["This tab can only be filled in by an admin. Enter the admin code to open it.", "Bu sekme yalnızca yönetici tarafından doldurulabilir. Açmak için yönetici kodunu girin."]],["Kode admin", ["Admin code", "Yönetici kodu"]],["Buka", ["Open", "Aç"]],["Kode admin salah.", ["Wrong admin code.", "Yönetici kodu yanlış."]],["Fitur admin belum aktif di database. Jalankan update-admin.sql di Supabase.", ["The admin feature is not active in the database yet. Run update-admin.sql in Supabase.", "Yönetici özelliği veritabanında henüz etkin değil. Supabase'de update-admin.sql dosyasını çalıştırın."]],["Tidak bisa terhubung. Coba lagi.", ["Cannot connect. Please try again.", "Bağlanılamadı. Lütfen tekrar deneyin."]],["🔓 Mode admin", ["🔓 Admin mode", "🔓 Yönetici modu"]],["Kunci kembali", ["Lock again", "Yeniden kilitle"]],["Hanya admin yang dapat mengubah data ini", ["Only an admin can change this data", "Bu veriyi yalnızca yönetici değiştirebilir"]],["✏️ Absensi untuk tanggal dan kegiatan ini sudah tersimpan. Perubahan akan menimpa data sebelumnya.", ["✏️ Attendance for this date and activity is already saved. Changes will overwrite the previous data.", "✏️ Bu tarih ve etkinlik için yoklama zaten kayıtlı. Değişiklikler önceki verilerin üzerine yazılır."]],["Kehadiran Etud hari ini", ["Study hall attendance today", "Bugünkü etüt yoklaması"]],["Semua siswa yang diabsen hadir.", ["All students recorded are present.", "Yoklaması alınan tüm öğrenciler mevcut."]],["Belum ada data absensi etud hari ini.", ["No study hall attendance recorded today.", "Bugün etüt yoklaması kaydedilmedi."]],["Rekap per siswa", ["Student summary", "Öğrenci özeti"]],["⬇ Unduh rekap siswa (Excel)", ["⬇ Download student summary (Excel)", "⬇ Öğrenci özetini indir (Excel)"]],["Edit", ["Edit", "Düzenle"]],["Batal", ["Cancel", "İptal"]],["Data siswa diperbarui", ["Student data updated", "Öğrenci bilgileri güncellendi"]],["Periode", ["Period", "Dönem"]],["1 minggu", ["1 week", "1 hafta"]],["2 minggu", ["2 weeks", "2 hafta"]],["1 bulan", ["1 month", "1 ay"]],["Kustom", ["Custom", "Özel"]],["Awal siklus 2 mingguan", ["Start of the 2-week cycle", "2 haftalık döngünün başlangıcı"]],["Sholat", ["Prayer", "Namaz"]],["Biasa", ["Regular", "Normal"]],["Nama kegiatan", ["Activity name", "Etkinlik adı"]],["Kartu kuning otomatis", ["Automatic yellow card", "Otomatik sarı kart"]],["Nama kategori (kosongkan jika tidak ada)", ["Category name (leave empty for none)", "Kategori adı (yoksa boş bırakın)"]],["Atur kegiatan absensi: tambah, hapus, ubah urutan, jenis, dan piket. Menghapus kegiatan tidak menghapus riwayat absensinya. Kartu kuning otomatis berlaku untuk Telat dan Alpa pada kegiatan sholat, dan untuk Alpa pada kegiatan biasa.", ["Manage the attendance activities: add, delete, reorder, and set the type and duty shift. Deleting an activity does not delete its attendance history. The automatic yellow card applies to Late and Absent for prayer activities, and to Absent for regular activities.", "Yoklama etkinliklerini yönetin: ekleyin, silin, sırasını, türünü ve nöbet vardiyasını değiştirin. Etkinliği silmek yoklama geçmişini silmez. Otomatik sarı kart, namaz etkinliklerinde Geç ve Devamsız için, normal etkinliklerde Devamsız için geçerlidir."]],["Isi nama kegiatan", ["Enter an activity name", "Etkinlik adı girin"]],["Nama kegiatan sudah ada", ["That activity already exists", "Bu etkinlik zaten var"]],["Kegiatan ditambahkan", ["Activity added", "Etkinlik eklendi"]],["Hapus kegiatan ini? Riwayat absensinya tetap tersimpan.", ["Delete this activity? Its attendance history is kept.", "Bu etkinlik silinsin mi? Yoklama geçmişi korunur."]],["Ngaji Pagi", ["Morning Quran study", "Sabah Kur'an dersi"]],["Nilai Kamar", ["Room Score", "Oda Puanı"]],["Nilai kamar", ["Room score", "Oda puanı"]],["Rata-rata nilai kamar", ["Average room score", "Ortalama oda puanı"]],["Pemeriksaan terakhir", ["Latest inspection", "Son denetim"]],["Nomor kamar siswa belum terdaftar di daftar kamar (Input Data → Kebersihan).", ["The student's room number is not in the room list yet (Add Data → Cleanliness).", "Öğrencinin oda numarası oda listesinde yok (Veri Girişi → Temizlik)."]],["Telat", ["Late", "Geç"]],["Pilih nilai tiap kriteria. Kriteria bernilai 2 bisa diberi 0, 1, atau 2; yang bernilai 1 bisa diberi 0 atau 1. Skor dihitung otomatis (maksimal 16).", ["Choose a score for each criterion. A criterion worth 2 can be given 0, 1 or 2; one worth 1 can be given 0 or 1. The score is calculated automatically (maximum 16).", "Her ölçüt için puan seçin. 2 değerindeki ölçüte 0, 1 veya 2; 1 değerindekine 0 veya 1 verilebilir. Puan otomatik hesaplanır (en fazla 16)."]],["Piket Pagi", ["Morning duty", "Sabah nöbeti"]],["Piket Malam", ["Night duty", "Gece nöbeti"]],["Kebersihan", ["Cleanliness", "Temizlik"]],["Kebersihan Kamar", ["Room Cleanliness", "Oda Temizliği"]],["Kebersihan kamar hari ini", ["Room cleanliness today", "Bugünkü oda temizliği"]],["Kamar diperiksa hari ini", ["Rooms inspected today", "Bugün denetlenen odalar"]],["Rata-rata skor hari ini", ["Average score today", "Bugünkü ortalama puan"]],["Skor terendah hari ini", ["Lowest score today", "Bugünkü en düşük puan"]],["Diperiksa", ["Inspected", "Denetlendi"]],["Rata-rata", ["Average", "Ortalama"]],["Skor", ["Score", "Puan"]],["Belum ada nomor kamar. Tambahkan di ＋ Input Data → Kebersihan.", ["No room numbers yet. Add them in ＋ Add Data → Cleanliness.", "Henüz oda numarası yok. ＋ Veri Girişi → Temizlik bölümünden ekleyin."]],["Belum ada nomor kamar. Tambahkan di bawah (Kelola nomor kamar).", ["No room numbers yet. Add them below (Manage room numbers).", "Henüz oda numarası yok. Aşağıdan ekleyin (Oda numaralarını yönet)."]],["Belum ada pemeriksaan.", ["No inspections yet.", "Henüz denetim yok."]],["Belum terpenuhi", ["Not met", "Karşılanmayanlar"]],["Kriteria penilaian", ["Assessment criteria", "Değerlendirme ölçütleri"]],["Pemeriksaan terbaru", ["Latest inspections", "Son denetimler"]],["Nomor kamar", ["Room number", "Oda numarası"]],["Kelola nomor kamar", ["Manage room numbers", "Oda numaralarını yönet"]],["✓ Semua terpenuhi", ["✓ All met", "✓ Hepsi karşılandı"]],["Simpan Pemeriksaan", ["Save inspection", "Denetimi kaydet"]],["Pemeriksa", ["Inspector", "Denetleyen"]],["Centang setiap kriteria yang terpenuhi. Skor dihitung otomatis dari nilai tiap kriteria (maksimal 16).", ["Tick every criterion that is met. The score is calculated automatically from each criterion's value (maximum 16).", "Karşılanan her ölçütü işaretleyin. Puan, her ölçütün değerinden otomatik hesaplanır (en fazla 16)."]],["Pilih kamar dulu", ["Choose a room first", "Önce bir oda seçin"]],["Pemeriksaan tersimpan", ["Inspection saved", "Denetim kaydedildi"]],["Isi nomor kamar", ["Enter a room number", "Oda numarası girin"]],["Nomor kamar sudah ada", ["That room number already exists", "Bu oda numarası zaten var"]],["Kamar ditambahkan", ["Room added", "Oda eklendi"]],["Hapus kamar ini beserta semua data kebersihannya?", ["Delete this room along with all its cleanliness data?", "Bu oda, tüm temizlik verileriyle birlikte silinsin mi?"]],["Hapus pemeriksaan ini?", ["Delete this inspection?", "Bu denetim silinsin mi?"]],["Isi nama piket pagi dulu", ["Enter the morning duty name first", "Önce sabah nöbetçisinin adını girin"]],["Isi nama piket malam dulu", ["Enter the night duty name first", "Önce gece nöbetçisinin adını girin"]],["Beranda", ["Home", "Ana Sayfa"]],["Monitoring", ["Monitoring", "Takip"]],["Tanggal Real-Time", ["Real-Time Date", "Anlık Tarih"]],["Waktu Live", ["Live Time", "Canlı Saat"]],["Unduh Excel", ["Download Excel", "Excel indir"]],["% Hadir", ["% Present", "% Mevcut"]],["Leaderboard", ["Leaderboard", "Liderlik tablosu"]],["🟢 Top 20", ["🟢 Top 20", "🟢 İlk 20"]],["🔴 Bottom 10", ["🔴 Bottom 10", "🔴 Son 10"]],["20 siswa dengan poin tertinggi (di atas 0)", ["20 students with the highest points (above 0)", "Puanı en yüksek 20 öğrenci (0'ın üzerinde)"]],["10 siswa dengan poin terendah (di bawah 0)", ["10 students with the lowest points (below 0)", "Puanı en düşük 10 öğrenci (0'ın altında)"]],["Pilih Siswa", ["Select Student", "Öğrenci Seçin"]],["Piket hari ini",["Today's duty supervisors","Bugünün nöbetçi sorumluları"]],["🏠 Monitoring Asrama", ["🏠 Dormitory Monitoring", "🏠 Yurt Takip Sistemi"]], ["Monitoring Asrama", ["Dormitory Monitoring", "Yurt Takip Sistemi"]], ["Keluar", ["Log out", "Çıkış"]], ["＋ Input Data", ["＋ Add Data", "＋ Veri Girişi"]], ["Input Data", ["Add Data", "Veri Girişi"]], ["Dashboard", ["Dashboard", "Panel"]], ["Rekap", ["Summary", "Özet"]], ["Monitoring Siswa", ["Student Monitoring", "Öğrenci Takibi"]], ["Absensi", ["Attendance", "Yoklama"]], ["Kartu", ["Cards", "Kartlar"]], ["Siswa", ["Students", "Öğrenciler"]], ["Kategori", ["Category", "Kategori"]], ["Peringatan", ["Alerts", "Uyarılar"]], ["Bahasa", ["Language", "Dil"]], ["Masuk", ["Log in", "Giriş"]], ["Kode akses", ["Access code", "Erişim kodu"]], ["Aplikasi belum disambungkan ke database. Isi config.js sesuai panduan.", ["The app is not connected to the database yet. Fill in config.js according to the guide.", "Uygulama henüz veritabanına bağlı değil. config.js dosyasını kılavuza göre doldurun."]], ["Memeriksa…", ["Checking…", "Kontrol ediliyor…"]], ["Kode akses salah.", ["Wrong access code.", "Erişim kodu yanlış."]], ["Kode akses tidak valid. Masukkan lagi.", ["The access code is not valid. Please enter it again.", "Erişim kodu geçersiz. Lütfen tekrar girin."]], ["● Tersinkron", ["● Synced", "● Eşitlendi"]], ["○ Offline", ["○ Offline", "○ Çevrimdışı"]], ["Pembina piket hari ini", ["Today's duty supervisors", "Bugünün nöbetçi sorumluları"]], ["Belum diisi", ["Not filled in", "Girilmedi"]], ["Total siswa", ["Total students", "Toplam öğrenci"]], ["Sakit", ["Sick", "Hasta"]], ["Alpa", ["Absent", "Devamsız"]], ["Izin", ["Excused", "İzinli"]], ["Hadir", ["Present", "Mevcut"]], ["Kegiatan", ["Activity", "Etkinlik"]], ["Tercatat", ["Recorded", "Kaydedilen"]], ["Baik", ["Good", "İyi"]], ["Progres", ["Progress", "İlerleme"]], ["Kartu bulan ini", ["Cards this month", "Bu ayın kartları"]], ["🟨 Kartu Kuning", ["🟨 Yellow Card", "🟨 Sarı Kart"]], ["🟩 Kartu Hijau", ["🟩 Green Card", "🟩 Yeşil Kart"]], ["Total poin bulan ini", ["Total points this month", "Bu ay toplam puan"]], ["Jenis", ["Type", "Tür"]], ["Bulan ini", ["This month", "Bu ay"]], ["Belum ada kategori. Buka ＋ Input Data → Kategori.", ["No categories yet. Open ＋ Add Data → Category.", "Henüz kategori yok. ＋ Veri Girişi → Kategori bölümünü açın."]], ["Total poin siswa (keseluruhan)", ["Total student points (overall)", "Öğrenci toplam puanları (genel)"]], ["Poin terendah", ["Lowest points", "En düşük puanlar"]], ["Nama", ["Name", "Ad"]], ["Kelas", ["Class", "Sınıf"]], ["Poin", ["Points", "Puan"]], ["🟢 20 siswa dengan poin tertinggi", ["🟢 Top 20 students by points", "🟢 Puanı en yüksek 20 öğrenci"]], ["Kartu terbaru", ["Latest cards", "Son kartlar"]], ["Tanggal", ["Date", "Tarih"]], ["Cadangan data", ["Data backup", "Veri yedeği"]], ["⬇ Cadangkan semua data (Excel)", ["⬇ Back up all data (Excel)", "⬇ Tüm verileri yedekle (Excel)"]], ["Peringatan poin belum diatur. Atur di ＋ Input Data → Peringatan.", ["Point alerts are not set up. Set them in ＋ Add Data → Alerts.", "Puan uyarıları ayarlanmadı. ＋ Veri Girişi → Uyarılar bölümünden ayarlayın."]], ["Alasan", ["Reason", "Neden"]], ["✅ Tidak ada siswa yang melewati batas peringatan.", ["✅ No students have passed the alert limits.", "✅ Uyarı sınırını aşan öğrenci yok."]], ["Perlu perhatian:", ["Needs attention:", "Dikkat gerekiyor:"]], ["20 poin tertinggi", ["Top 20 points", "En yüksek 20 puan"]], ["Total poin", ["Total points", "Toplam puan"]], ["10 catatan terakhir", ["Last 10 records", "Son 10 kayıt"]], ["Catatan", ["Note", "Not"]], ["Status", ["Status", "Durum"]], ["Piket", ["Duty", "Nöbet"]], ["Belum ada catatan.", ["No records yet.", "Henüz kayıt yok."]], ["Belum ada kartu.", ["No cards yet.", "Henüz kart yok."]], ["Belum ada siswa.", ["No students yet.", "Henüz öğrenci yok."]], ["Belum ada data.", ["No data yet.", "Henüz veri yok."]], ["Belum ada.", ["None yet.", "Henüz yok."]], ["Tidak ada data.", ["No data.", "Veri yok."]], ["Dari", ["From", "Başlangıç"]], ["Sampai", ["To", "Bitiş"]], ["Semua", ["All", "Tümü"]], ["⬇ Unduh Excel", ["⬇ Download Excel", "⬇ Excel indir"]], ["% Baik", ["% Good", "% İyi"]], ["Total Poin", ["Total Points", "Toplam Puan"]], ["Baik = Jamaah, Masbuk, atau Hadir. 🟢 = termasuk 20 siswa dengan poin tertinggi.", ["Good = Present (or Jamaah/Masbuk in older records). 🟢 = among the top 20 students by points.", "İyi = Mevcut (eski kayıtlarda Cemaat/Geç katıldı). 🟢 = puanı en yüksek 20 öğrenciden biri."]], ["Pilih tanggal, piket, dan kegiatan, lalu ketuk ikon status tiap siswa (ketuk lagi untuk batal), atau pakai \"Isi Semua\". Tekan Simpan Absensi agar terkirim ke semua perangkat.", ["Choose the date, duty supervisors and activity, then tap each student's status icon (tap again to undo), or use \"Fill all\". Press Save attendance so it is sent to all devices.", "Tarihi, nöbetçi sorumluları ve etkinliği seçin, sonra her öğrencinin durum simgesine dokunun (geri almak için tekrar dokunun) veya \"Tümünü doldur\"u kullanın. Tüm cihazlara gönderilmesi için Yoklamayı kaydet'e basın."]], ["Pembina piket 1", ["Duty supervisor 1", "Nöbetçi sorumlu 1"]], ["Pembina piket 2", ["Duty supervisor 2", "Nöbetçi sorumlu 2"]], ["Pembina piket", ["Duty supervisor", "Nöbetçi sorumlu"]], ["Tampilkan", ["Show", "Göster"]], ["✓ Isi Semua", ["✓ Fill all", "✓ Tümünü doldur"]], ["Simpan Absensi", ["Save attendance", "Yoklamayı kaydet"]], ["Kamar", ["Room", "Oda"]], ["Belum ada siswa. Tambahkan di tab Siswa.", ["No students yet. Add them in the Students tab.", "Henüz öğrenci yok. Öğrenciler sekmesinden ekleyin."]], ["Simpan Kartu", ["Save card", "Kartı kaydet"]], ["Belum ada kategori untuk jenis ini. Tambahkan dulu di tab Kategori.", ["No categories for this type yet. Add one first in the Category tab.", "Bu tür için henüz kategori yok. Önce Kategori sekmesinden ekleyin."]], ["(belum ada siswa)", ["(no students yet)", "(henüz öğrenci yok)"]], ["(belum ada)", ["(none yet)", "(henüz yok)"]], ["Hapus", ["Delete", "Sil"]], ["Isi sendiri kategori dan poinnya. Kartu hijau menambah poin, kartu kuning mengurangi. Total poin = poin hijau − poin kuning. Kartu yang sudah tercatat tetap aman walau kategorinya dihapus.", ["Fill in the categories and their points yourself. Green cards add points, yellow cards subtract. Total points = green points − yellow points. Recorded cards stay safe even if their category is deleted.", "Kategorileri ve puanlarını kendiniz girin. Yeşil kartlar puan ekler, sarı kartlar puan düşer. Toplam puan = yeşil puan − sarı puan. Kaydedilmiş kartlar, kategorisi silinse bile korunur."]], ["Nama kategori", ["Category name", "Kategori adı"]], ["Tambah", ["Add", "Ekle"]], ["🟨 Kategori Kartu Kuning", ["🟨 Yellow card categories", "🟨 Sarı kart kategorileri"]], ["🟩 Kategori Kartu Hijau", ["🟩 Green card categories", "🟩 Yeşil kart kategorileri"]], ["Tambah banyak sekaligus", ["Add many at once", "Toplu ekle"]], ["Satu siswa per baris: Nama, Kelas, Kamar", ["One student per line: Name, Class, Room", "Her satırda bir öğrenci: Ad, Sınıf, Oda"]], ["Tambah semua", ["Add all", "Hepsini ekle"]], ["Dashboard menandai siswa yang melewati batas ini. Kosongkan kolom untuk menonaktifkan.", ["The dashboard flags students who pass these limits. Leave a field empty to turn it off.", "Panel, bu sınırları aşan öğrencileri işaretler. Kapatmak için alanı boş bırakın."]], ["Tandai jika total poin kurang dari atau sama dengan", ["Flag if total points are less than or equal to", "Toplam puan şuna eşit veya daha azsa işaretle"]], ["Tandai jika kartu kuning bulan ini sebanyak atau lebih dari", ["Flag if yellow cards this month are at least", "Bu ayki sarı kart sayısı şu kadar veya fazlaysa işaretle"]], ["Simpan", ["Save", "Kaydet"]], ["contoh: -5", ["e.g. -5", "örn: -5"]], ["contoh: 3", ["e.g. 3", "örn: 3"]], ["Nama pembina", ["Supervisor name", "Sorumlu adı"]], ["Jamaah", ["In congregation", "Cemaatle"]], ["Masbuk", ["Joined late", "Geç katıldı"]], ["Munfarid", ["Prayed alone", "Tek başına"]], ["Subuh", ["Fajr", "Sabah"]], ["Magrib", ["Maghrib", "Akşam"]], ["Isya", ["Isha", "Yatsı"]], ["Ngaji Magrib", ["Maghrib Quran study", "Akşam Kur'an dersi"]], ["Belajar Malam", ["Night study", "Gece etüdü"]], ["Absensi Malam", ["Night roll call", "Gece yoklaması"]], ["Absensi Pagi", ["Morning roll call", "Sabah yoklaması"]], ["🟨 Kuning", ["🟨 Yellow", "🟨 Sarı"]], ["🟩 Hijau", ["🟩 Green", "🟩 Yeşil"]], ["Cadangan diunduh", ["Backup downloaded", "Yedek indirildi"]], ["File Excel diunduh", ["Excel file downloaded", "Excel dosyası indirildi"]], ["Format: Nama, Kelas, Kamar", ["Format: Name, Class, Room", "Biçim: Ad, Sınıf, Oda"]], ["Hapus kartu ini?", ["Delete this card?", "Bu kart silinsin mi?"]], ["Hapus kategori ini?", ["Delete this category?", "Bu kategori silinsin mi?"]], ["Hapus siswa ini beserta semua data absensi dan kartunya?", ["Delete this student along with all their attendance and card data?", "Bu öğrenci, tüm yoklama ve kart verileriyle birlikte silinsin mi?"]], ["Isi nama kategori", ["Enter a category name", "Kategori adı girin"]], ["Isi nama kedua pembina piket dulu", ["Enter both duty supervisors' names first", "Önce her iki nöbetçi sorumlunun adını girin"]], ["Kartu tersimpan", ["Card saved", "Kart kaydedildi"]], ["Kategori ditambahkan", ["Category added", "Kategori eklendi"]], ["Library Excel belum termuat. Coba saat online.", ["The Excel library has not loaded. Try again when online.", "Excel kitaplığı yüklenmedi. Çevrimiçiyken tekrar deneyin."]], ["Masih ada data belum terkirim. Tetap keluar?", ["Some data has not been sent yet. Log out anyway?", "Bazı veriler henüz gönderilmedi. Yine de çıkış yapılsın mı?"]], ["Nama dan kelas wajib diisi", ["Name and class are required", "Ad ve sınıf zorunludur"]], ["Pengaturan peringatan tersimpan", ["Alert settings saved", "Uyarı ayarları kaydedildi"]], ["Pilih kategori dulu (tambah di tab Kategori)", ["Choose a category first (add one in the Category tab)", "Önce bir kategori seçin (Kategori sekmesinden ekleyin)"]], ["Pilih siswa dulu", ["Choose a student first", "Önce bir öğrenci seçin"]], ["Siswa ditambahkan", ["Student added", "Öğrenci eklendi"]], ["Tekan Tampilkan dulu", ["Press Show first", "Önce Göster'e basın"]], ["Absensi tersimpan", ["Attendance saved", "Yoklama kaydedildi"]], ["Tersimpan di HP, dikirim saat online", ["Saved on this device, will be sent when online", "Cihazda kaydedildi, çevrimiçi olunca gönderilecek"]], ["Tentang", ["About", "Hakkında"]], ["Tentang Aplikasi", ["About the App", "Uygulama Hakkında"]], ["Aplikasi pencatatan absensi, kartu, dan poin siswa asrama.", ["An app for recording dormitory students' attendance, cards and points.", "Yurt öğrencilerinin yoklama, kart ve puan kayıtları için uygulama."]], ["Dibuat oleh", ["Created by", "Hazırlayan"]], ["belum pernah", ["never", "hiç"]], ["Detail", ["Detail", "Ayrıntı"]], ["Total", ["Total", "Toplam"]], ["Kartu Kuning", ["Yellow Cards", "Sarı Kartlar"]], ["Kartu Hijau", ["Green Cards", "Yeşil Kartlar"]], ["Kuning", ["Yellow", "Sarı"]], ["Hijau", ["Green", "Yeşil"]], ["Pembina 1", ["Supervisor 1", "Sorumlu 1"]], ["Pembina 2", ["Supervisor 2", "Sorumlu 2"]], ["Pembina", ["Supervisor", "Sorumlu"]], ["(dihapus)", ["(deleted)", "(silindi)"]],["Tadarus Pagi", ["Morning Tadarus", "Sabah Tadarusu"]],["Tadarus Magrib", ["Maghrib Tadarus", "Akşam Tadarusu"]],["Belajar Mandiri", ["Self study", "Bireysel çalışma"]],["Summary harian", ["Daily summary", "Günlük özet"]],["Tidak hadir", ["Absent", "Gelmeyen"]],["Belum diabsen", ["Not yet recorded", "Henüz kaydedilmedi"]],["Belum ada absensi", ["No attendance yet", "Henüz yoklama yok"]],["Semua siswa hadir.", ["All students present.", "Tüm öğrenciler mevcut."]],["Belum ada kegiatan.", ["No activities yet.", "Henüz etkinlik yok."]],["Peringkat Kartu (2 Minggu)", ["Card Ranking (2 weeks)", "Kart Sıralaması (2 hafta)"]],["🟨 5 Kartu Kuning Terbanyak", ["🟨 Top 5 Yellow Cards", "🟨 En çok sarı kart (ilk 5)"]],["🟩 5 Kartu Hijau Terbanyak", ["🟩 Top 5 Green Cards", "🟩 En çok yeşil kart (ilk 5)"]],["Belum ada kartu pada periode ini.", ["No cards in this period yet.", "Bu dönemde henüz kart yok."]],["Periode 2 minggu diatur di Rekap → Awal siklus 2 mingguan.", ["The 2-week period is set in Rekap → 2-week cycle start.", "2 haftalık dönem Rekap → 2 haftalık döngü başlangıcı bölümünden ayarlanır."]],["Untuk mengganti nama kegiatan, ketuk nama di kartu lalu ubah. Riwayat absensinya ikut pindah ke nama baru.", ["To rename an activity, tap its name on the card and edit it. Its attendance history moves to the new name.", "Etkinliği yeniden adlandırmak için karttaki ada dokunup düzenleyin. Yoklama geçmişi yeni ada taşınır."]],["Ubah nama kegiatan ini? Riwayat absensinya ikut dipindahkan ke nama baru.", ["Rename this activity? Its attendance history will move to the new name.", "Bu etkinliğin adı değişsin mi? Yoklama geçmişi yeni ada taşınacak."]],["Nama kegiatan diubah", ["Activity renamed", "Etkinlik adı değiştirildi"]],["Nama lama terdeteksi.", ["Old names detected.", "Eski adlar bulundu."]],["Ngaji → Tadarus, Belajar Malam → Belajar Mandiri. Riwayat absensi ikut dipindahkan.", ["Ngaji → Tadarus, Belajar Malam → Belajar Mandiri. Attendance history moves too.", "Ngaji → Tadarus, Belajar Malam → Belajar Mandiri. Yoklama geçmişi de taşınır."]],["Terapkan nama baru", ["Apply new names", "Yeni adları uygula"]],["Terapkan nama baru? Riwayat absensinya ikut dipindahkan.", ["Apply the new names? Attendance history will move too.", "Yeni adlar uygulansın mı? Yoklama geçmişi de taşınır."]],["Nama kegiatan diperbarui", ["Activity names updated", "Etkinlik adları güncellendi"]],["Urutkan sesuai jadwal harian", ["Sort by daily schedule", "Günlük programa göre sırala"]],["Urutkan kegiatan sesuai jadwal harian (Subuh sampai Absensi Malam)?", ["Sort activities by the daily schedule (Subuh to Absensi Malam)?", "Etkinlikler günlük programa göre (Subuh'tan Absensi Malam'a) sıralansın mı?"]],["Urutan kegiatan diperbarui", ["Activity order updated", "Etkinlik sırası güncellendi"]],["Hadir/Alpa saja", ["Present/Absent only", "Yalnızca Var/Yok"]],["Siklus ini", ["This cycle", "Bu dönem"]],["Siklus sebelumnya", ["Previous cycle", "Önceki dönem"]],["Riwayat juara tiap siklus", ["Winners history by cycle", "Dönem başına şampiyonlar"]],["🟩 Hijau teratas", ["🟩 Top green", "🟩 En çok yeşil"]],["🟨 Kuning teratas", ["🟨 Top yellow", "🟨 En çok sarı"]],["Belum ada riwayat siklus.", ["No cycle history yet.", "Henüz dönem geçmişi yok."]],["Hari ini", ["Today", "Bugün"]]]);
+[["HP & Berangkat",["Phones & Departure","Telefon ve Çıkış"]],["HP",["Phones","Telefon"]],["Rekap HP & Keberangkatan",["Phone Collection & Departure Report","Telefon Toplama ve Çıkış Raporu"]],["Pengumpulan HP Pagi",["Morning Phone Collection","Sabah Telefon Toplama"]],["Keberangkatan Sekolah",["School Departure","Okula Çıkış"]],["HP Pagi",["Morning phone","Sabah telefonu"]],["Berangkat",["Departure","Çıkış"]],["Keterangan",["Remark","Açıklama"]],["Sudah kumpul HP",["Phones handed in","Teslim edilen telefon"]],["Tidak kumpul HP",["Phone not handed in","Telefon teslim edilmedi"]],["Berangkat tanpa kumpul HP",["Left for school without handing in phone","Telefonu teslim etmeden okula çıktı"]],["Cek: HP belum diabsen, sudah berangkat",["Check: phone not recorded, already left","Kontrol: telefon kaydedilmedi, çıktı"]],["Kumpul HP telat",["Phone handed in late","Telefonu geç teslim etti"]],["Izin / Sakit",["Excused / Sick","İzinli / Hasta"]],["Tidak mengumpulkan HP",["Did not hand in phone","Telefonunu teslim etmeyenler"]],["Semua siswa yang diabsen sudah mengumpulkan HP.",["All recorded students handed in their phones.","Kaydı alınan tüm öğrenciler telefonunu teslim etti."]],["Telat, izin/sakit, dan belum diabsen",["Late, excused/sick, and not yet recorded","Geç, izinli/hasta ve henüz kaydedilmeyenler"]],["Absensi Pengumpulan HP Pagi belum diisi pada tanggal ini.",["Morning phone collection has not been recorded for this date.","Bu tarih için sabah telefon toplama kaydı girilmedi."]],["Isi lewat ＋ Input Data → Absensi. Pengumpulan HP Pagi: Hadir = sudah mengumpulkan HP, Alpa = tidak mengumpulkan. Keberangkatan Sekolah: Hadir/Telat = berangkat ke sekolah.",["Fill in via ＋ Add Data → Attendance. Morning Phone Collection: Present = phone handed in, Absent = not handed in. School Departure: Present/Late = left for school.","＋ Veri Girişi → Yoklama bölümünden girin. Sabah Telefon Toplama: Mevcut = teslim etti, Devamsız = teslim etmedi. Okula Çıkış: Mevcut/Geç = okula çıktı."]],["Kegiatan Pengumpulan HP Pagi dan/atau Keberangkatan Sekolah belum ada. Buka ＋ Input Data → Kegiatan lalu tekan tombol Tambah Keberangkatan Sekolah & Pengumpulan HP Pagi.",["The Morning Phone Collection and/or School Departure activity does not exist yet. Open ＋ Add Data → Activities and press the button to add School Departure & Morning Phone Collection.","Sabah Telefon Toplama ve/veya Okula Çıkış etkinliği henüz yok. ＋ Veri Girişi → Etkinlik bölümünü açıp Okula Çıkış ve Sabah Telefon Toplama ekleme düğmesine basın."]]].forEach(([k,v])=>D.set(k,v));
+const P=[
+ [/^Belum diabsen: (\d+) siswa$/,(m,i)=>i?`Yoklaması alınmayan: ${m[1]} öğrenci`:`Not yet recorded: ${m[1]} students`],
+ [/^Hari ini: (.*)$/,(m,i)=>(i?'Bugün: ':'Today: ')+m[1]],
+ [/^Kelas (.*) · Kamar (.*)$/,(m,i)=>i?`Sınıf ${m[1]} · Oda ${m[2]}`:`Class ${m[1]} · Room ${m[2]}`],
+ [/^⏳ (\d+) belum terkirim$/,(m,i)=>i?`⏳ ${m[1]} gönderilmedi`:`⏳ ${m[1]} not sent yet`],
+ [/^⚠️ Perlu perhatian \((\d+) siswa\)$/,(m,i)=>i?`⚠️ Dikkat gerekiyor (${m[1]} öğrenci)`:`⚠️ Needs attention (${m[1]} students)`],
+ [/^(\d+) siswa ditambahkan$/,(m,i)=>i?`${m[1]} öğrenci eklendi`:`${m[1]} students added`],
+ [/^Total poin ([+-]?\d+) \(batas ([+-]?\d+)\)$/,(m,i)=>i?`Toplam puan ${m[1]} (sınır ${m[2]})`:`Total points ${m[1]} (limit ${m[2]})`],
+ [/^(\d+) kartu kuning bulan ini \(batas (\d+)\)$/,(m,i)=>i?`Bu ay ${m[1]} sarı kart (sınır ${m[2]})`:`${m[1]} yellow cards this month (limit ${m[2]})`],
+ [/^(.*) \((\d+) poin\)$/,(m,i)=>i?`${m[1]} (${m[2]} puan)`:`${m[1]} (${m[2]} pts)`],
+ [/^(\d+) poin$/,(m,i)=>i?`${m[1]} puan`:`${m[1]} pts`],
+ [/^Cadangan terakhir di perangkat ini: (.*)\. Disarankan sekali seminggu\.$/,(m,i)=>i?`Bu cihazdaki son yedek: ${tx(m[1])}. Haftada bir önerilir.`:`Last backup on this device: ${tx(m[1])}. Recommended once a week.`],
+ [/^· peringkat (\d+)$/,(m,i)=>i?`· sıra ${m[1]}`:`· rank ${m[1]}`],
+ [/^Versi (.*)$/,(m,i)=>(i?'Sürüm ':'Version ')+m[1]],
+ [/^Tahun pembuatan: (.*)$/,(m,i)=>(i?'Yapım yılı: ':'Year created: ')+m[1]],
+ [/^© (\d+) (.*)\. Hak cipta dilindungi\.$/,(m,i)=>i?`© ${m[1]} ${m[2]}. Tüm hakları saklıdır.`:`© ${m[1]} ${m[2]}. All rights reserved.`],
+ [/^Tidak bisa terhubung \((.*?)\): ([\s\S]*)$/,(m,i)=>(i?`Bağlanılamadı (${m[1]}): `:`Cannot connect (${m[1]}): `)+m[2]]
+];
+function tx(str){
+ if(lang==='id'||typeof str!=='string')return str;
+ const i=lang==='en'?0:1,k=str.trim();if(!k)return str;
+ const d=D.get(k);if(d)return str.replace(k,()=>d[i]);
+ for(const p of P){const m=k.match(p[0]);if(m){const r=p[1](m,i);return str.replace(k,()=>r)}}
+ if(k.includes('; ')){const r=k.split('; ').map(x=>tx(x)).join('; ');return str.replace(k,()=>r)}
+ return str;
+}
+const SKIP=new Set(['SCRIPT','STYLE','TEXTAREA']);
+function trNode(n){
+ if(n.nodeType===3){const pn=n.parentNode;if(pn&&(SKIP.has(pn.nodeName)||(pn.closest&&pn.closest('[data-nt]'))))return;if(n._o===undefined)n._o=n.nodeValue;const v=tx(n._o);if(n.nodeValue!==v)n.nodeValue=v;return}
+ if(n.nodeType!==1||SKIP.has(n.nodeName)||n.closest('[data-nt]'))return;
+ const w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT);
+ const fix=e=>{if(e.nodeType===1&&!SKIP.has(e.nodeName)&&!e.closest('[data-nt]'))['placeholder','aria-label','title'].forEach(a=>{if(e.hasAttribute&&e.hasAttribute(a)){e._oa=e._oa||{};if(e._oa[a]===undefined)e._oa[a]=e.getAttribute(a);const v=tx(e._oa[a]);if(e.getAttribute(a)!==v)e.setAttribute(a,v)}})};
+ fix(n);let x=w.nextNode();while(x){if(x.nodeType===3)trNode(x);else fix(x);x=w.nextNode()}
+}
+const applyAll=()=>trNode(document.body);
+const _cf=window.confirm.bind(window);window.confirm=m=>_cf(tx(m));
+if(typeof XLSX!=='undefined'){const a=XLSX.utils.aoa_to_sheet,b=XLSX.utils.book_append_sheet;
+ XLSX.utils.aoa_to_sheet=(r,o)=>a(r.map(x=>x.map(c=>typeof c==='string'?tx(c):c)),o);
+ XLSX.utils.book_append_sheet=(wb,ws,nm)=>b(wb,ws,tx(nm))}
+function renderFooter(){$('#ft').innerHTML=`<span>Dibuat oleh</span> <b>${esc(CREDIT.nama)}</b> · © ${CREDIT.tahun} · <a href="#" id="abl">Tentang</a>`}
+function openAbout(){
+ $('#ab').innerHTML=`<div class="card"><div style="font-size:1.25rem;font-weight:700">🏠 Monitoring Asrama</div><div class="mut">Versi ${APP_VER}</div><p>Aplikasi pencatatan absensi, kartu, dan poin siswa asrama.</p></div>
+ <div class="card"><div class="mut">Dibuat oleh</div><div style="font-size:1.1rem;font-weight:700">${esc(CREDIT.nama)}</div><div class="mut">Tahun pembuatan: ${CREDIT.tahun}</div></div>
+ <p class="mut" style="text-align:center">© ${CREDIT.tahun} ${esc(CREDIT.nama)}. Hak cipta dilindungi.</p>`;
+ $('#abt').classList.add('on');
+}
+const closeAbout=()=>$('#abt').classList.remove('on');
+$('#ft').onclick=e=>{if(e.target.id==='abl'){e.preventDefault();openAbout()}};
+$('#ax').onclick=closeAbout;$('#abt').onclick=e=>{if(e.target.id==='abt')closeAbout()};
+addEventListener('keydown',e=>{if(e.key==='Escape')closeAbout()});
+$('#lang').value=lang;
+$('#lang').onchange=e=>{lang=e.target.value;LS('lang',lang);document.documentElement.lang=lang;document.title=tx('Monitoring Asrama');
+ renderFooter();applyAll();if(!code)showLogin('');else{go();if(modalOpen())renderM()}
+ if($('#abt').classList.contains('on'))openAbout();setSt()};
+
+/* ---------- data & sinkronisasi ---------- */
+let code=LS('code'),db=LS('db')||{students:[],att:{},piket:{}},q=LS('q')||[],online=true,flushing=false;
+db.cats=db.cats||[];db.cards=db.cards||[];db.cfg=db.cfg||{};db.rooms=db.rooms||[];db.clean=db.clean||{};db.acts=db.acts||[];
+let ADM=LS('adm')||'';
+let SEQ=0,FP=null,LASTERR='';
+async function rpc(fn,body){
+ const base=CFG.url.trim().replace(/\/rest\/v1\/?$/,'').replace(/\/+$/,''),key=CFG.key.trim();
+ const h={apikey:key,'Content-Type':'application/json'};if(key.startsWith('eyJ'))h.Authorization='Bearer '+key;
+ const r=await fetch(base+'/rest/v1/rpc/'+fn,{method:'POST',headers:h,body:JSON.stringify(body)});
+ const t=await r.text();
+ if(!r.ok){const e=new Error(t);e.admin=t.includes('forbidden_admin');e.forbidden=!e.admin&&t.includes('forbidden');e.status=r.status;throw e}
+ return t?JSON.parse(t):null;
+}
+function fromRows(rows){
+ const d={students:[],att:{},piket:{},cats:[],cards:[],cfg:{},rooms:[],clean:{},acts:[]};
+ rows.forEach(r=>{const k=r.key,id=k.slice(2);
+  if(k[0]==='s')d.students.push({id,...r.value});else if(k[0]==='a')d.att[id]=r.value;else if(k[0]==='p')d.piket[id]={a:r.value.nama||'',b:r.value.nama2||''};else if(k[0]==='e')d.acts.push({id,...r.value});else if(k[0]==='g')d.cfg=r.value;else if(k[0]==='c')d.cats.push({id,...r.value});else if(k[0]==='k')d.cards.push({id,...r.value});else if(k[0]==='r')d.rooms.push({id,...r.value});else if(k[0]==='h')d.clean[id]=normC(r.value)});d.rooms.sort((a,b)=>a.no.localeCompare(b.no,undefined,{numeric:true}));d.acts.sort((a,b)=>(a.urut||0)-(b.urut||0));
+ d.students.sort(stuCmp);
+ return d;
+}
+function setSt(){const n=q.length;$('#st').textContent=!code?'':n?`⏳ ${n} belum terkirim`:online?'● Tersinkron':'○ Offline';}
+function sync(items){SEQ++;q.push(items);LS('q',q);LS('db',db);setSt();flush()}
+function flush(){if(FP)return FP;FP=_flush().finally(()=>{FP=null});return FP}
+async function _flush(){
+ if(!q.length||flushing||!code)return;flushing=true;
+ try{while(q.length){await rpc('kv_batch',ADM?{p_code:code,p_items:q[0],p_admin:ADM}:{p_code:code,p_items:q[0]});q.shift();LS('q',q)};online=true;LASTERR=''}
+ catch(e){if(e.forbidden)logout();else if(e.admin){const bad=q.shift();LS('q',q);ADM='';LS('adm',null);(async()=>{let n=0;for(const it of bad){try{await rpc('kv_batch',{p_code:code,p_items:[it]})}catch(x){if(x.admin)n++;else q.push([it])}}LS('q',q);if(n)toast('Hanya admin yang dapat mengubah data ini');setTimeout(()=>{flush();pull()},300)})()}else{online=false;LASTERR=((e.status||'')+' '+String(e.message||'')).trim().slice(0,140)}}
+ finally{flushing=false;setSt()}
+}
+async function pull(){
+ if(!code)return;await flush();if(q.length)return;
+ const s0=SEQ;try{const rows=await rpc('kv_list',{p_code:code});if(SEQ!==s0||q.length||flushing)return;db=fromRows(rows);LS('db',db);online=true;setSt();
+  if(!modalOpen()&&!document.activeElement.matches('input,select,textarea'))go()}
+ catch(e){if(e.forbidden)logout();else{online=false;setSt()}}
+}
+function logout(msg){code=null;LS('code',null);showLogin(msg||'Kode akses tidak valid. Masukkan lagi.')}
+
+const pkTxt=d=>{const p=db.piket[d];if(!p)return'';if(typeof p==='string')return p;return[p.a,p.b].filter(Boolean).join(' & ')};
+const pkv=(d,i)=>{const p=db.piket[d];if(!p)return'';if(typeof p==='string')return i?'':p;return(i?p.b:p.a)||''};
+const setPiket=(d,a,b)=>{if(a||b)db.piket[d]={a:a||'',b:b||''};else delete db.piket[d];sync([{key:'p:'+d,value:(a||b)?{nama:a||'',nama2:b||''}:null}])};
+const addStu=list=>{const it=list.map(([nama,kelas,kamar])=>{const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6),v={nama,kelas,kamar};db.students.push({id,...v});return{key:'s:'+id,value:v}});
+ db.students.sort(stuCmp);sync(it)};
+function delStu(id){db.students=db.students.filter(s=>s.id!==id);const it=[{key:'s:'+id,value:null}];db.cards=db.cards.filter(c=>{if(c.sid===id){it.push({key:'k:'+c.id,value:null});return false}return true});
+ Object.keys(db.att).forEach(k=>{if(k.endsWith('|'+id)){delete db.att[k];it.push({key:'a:'+k,value:null})}});sync(it)}
+const NC={numeric:true,sensitivity:'base'};
+const stuCmp=(a,b)=>a.kelas.localeCompare(b.kelas,undefined,NC)||a.nama.localeCompare(b.nama,undefined,{sensitivity:'base'})||(a.kamar||'').localeCompare(b.kamar||'',undefined,NC);
+const kelasList=()=>[...new Set(db.students.map(s=>s.kelas))].sort((a,b)=>a.localeCompare(b,undefined,NC));
+const kelasOpts=(sel,all)=>(all?`<option value="">Semua</option>`:'')+kelasList().map(k=>`<option ${k===sel?'selected':''}>${esc(k)}</option>`).join('');
+const rec=(d,a,id)=>db.att[d+'|'+a+'|'+id];
+const nid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const addCat=(nama,tipe,poin)=>{const id=nid(),v={nama,tipe,poin};db.cats.push({id,...v});sync([{key:'c:'+id,value:v}])};
+const delCat=id=>{db.cats=db.cats.filter(c=>c.id!==id);sync([{key:'c:'+id,value:null}])};
+const addCard=v=>{const id=nid();db.cards.push({id,...v});sync([{key:'k:'+id,value:v}])};
+const delCard=id=>{db.cards=db.cards.filter(c=>c.id!==id);sync([{key:'k:'+id,value:null}])};
+const cstat=(id,f,t)=>{let y=0,h=0;db.cards.forEach(c=>{if(c.sid===id&&c.tgl>=f&&c.tgl<=t){if(c.tipe==='kuning')y++;else h++}});return[y,h]};
+const jenis=t=>t==='kuning'?'🟨 Yellow':'🟩 Green';
+const U=d=>Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10));
+const addD=(d,n)=>new Date(U(d)+n*864e5).toISOString().slice(0,10);
+const monOf=d=>addD(d,-((new Date(U(d)).getUTCDay()+6)%7));
+function perRange(type,off){
+ const t=today();
+ if(type==='all')return{from:'2000-01-01',to:t};
+ if(type==='m1'){const y=+t.slice(0,4),m=+t.slice(5,7)-1+off;return{from:new Date(Date.UTC(y,m,1)).toISOString().slice(0,10),to:new Date(Date.UTC(y,m+1,0)).toISOString().slice(0,10)}}
+ if(type==='w1'){const a=addD(monOf(t),7*off);return{from:a,to:addD(a,6)}}
+ const an=monOf((db.cfg&&db.cfg.anchor)||'2026-01-05'),a=addD(an,(Math.floor((U(t)-U(an))/864e5/14)+off)*14);return{from:a,to:addD(a,13)}
+}
+const setAnchor=v=>{db.cfg=Object.assign({},db.cfg,{anchor:v});sync([{key:'g:cfg',value:db.cfg}])};
+const lbAll=(f='0000-00-00',t='9999-12-31')=>db.students.map(s=>{let g=0,y=0;db.cards.forEach(c=>{if(c.sid===s.id&&c.tgl>=f&&c.tgl<=t){const v=pt(c);if(v>0)g+=v;else y-=v}});return{s,g,y,t:g-y}});
+const lbList=(f,t)=>lbAll(f,t).sort((a,b)=>a.t-b.t||b.y-a.y||a.s.nama.localeCompare(b.s.nama));
+const lbRank=(id,f,t)=>{const l=lbList(f,t),n=l.length,i=l.findIndex(x=>x.s.id===id);if(i<0)return null;const x=l[i];if(i<10&&x.t<0)return{k:'low'};if(i>=Math.max(10,n-20)&&x.t>0)return{k:'high'};return null};
+const roomOf=kamar=>{const k=(kamar||'').trim().toUpperCase();return k?db.rooms.find(r=>r.no.toUpperCase()===k):null};
+const roomStat=(kamar,f,t)=>{const r=roomOf(kamar);if(!r)return null;const ks=Object.keys(db.clean).filter(k=>{const q=k.split('|');return q[1]===r.id&&q[0]>=f&&q[0]<=t}).sort();if(!ks.length)return null;const sc=ks.map(k=>cscore(db.clean[k].c));return{avg:sc.reduce((a,x)=>a+x,0)/sc.length,n:sc.length,last:sc[sc.length-1]}};
+const autoCat=(act,st)=>{const a=actOf(act);if(!a||!a.auto)return null;const bad=a.jenis==='sholat'?(st==='Telat'||st==='Alpa'):st==='Alpa';return bad?a.auto:null};
+const ensureCat=name=>{let c=db.cats.find(x=>x.tipe==='kuning'&&x.nama.toLowerCase()===name.toLowerCase());if(!c){if(ADM){addCat(name,'kuning',1);c=db.cats.find(x=>x.tipe==='kuning'&&x.nama===name)}else c={nama:name,poin:1}}return c};
+const CRIT=[['FLOOR','Clean',2],['BLANKET, PILLOW & BEDS','Tidy, No Other Stuff',2],['WARDROBE','Closed',2],['LAMP & FAN (Bath Room)','Off',1],['LAUNDRY STATION','Tidy',1],['CURTAINS','Open',1],['CLEANING TOOLS','Tidy',1],['UNDERNEATH the BEDS','Tidy, No Other Stuff',2],['BEDROOM LAYOUT','No Change',1],['SUITCASE','No Items',1],['SHOES & SANDALS','No Items',1],['TOWEL','Tidy',1]];
+const MAXC=CRIT.reduce((a,x)=>a+x[2],0);
+const cscore=c=>CRIT.reduce((a,x,i)=>a+Math.min(x[2],Math.max(0,+(c&&c[i])||0)),0);
+const normC=v=>(v&&v.f!==2)?{...v,f:2,c:CRIT.map((x,i)=>v.c&&v.c[i]?x[2]:0)}:v;
+const normAll=()=>Object.keys(db.clean).forEach(k=>{db.clean[k]=normC(db.clean[k])});
+const missList=v=>CRIT.map((x,i)=>[x,i]).filter(([x,i])=>((v.c&&v.c[i])||0)<x[2]).map(([x,i])=>x[0]+(v.c&&v.c[i]>0?' ('+v.c[i]+'/'+x[2]+')':''));
+const roomNo=id=>{const r=db.rooms.find(x=>x.id===id);return r?r.no:'(deleted)'};
+const addRoom=no=>{const id=nid(),v={no};db.rooms.push({id,...v});db.rooms.sort((a,b)=>a.no.localeCompare(b.no,undefined,{numeric:true}));sync([{key:'r:'+id,value:v}])};
+const delRoom=id=>{db.rooms=db.rooms.filter(r=>r.id!==id);const it=[{key:'r:'+id,value:null}];Object.keys(db.clean).forEach(k=>{if(k.endsWith('|'+id)){delete db.clean[k];it.push({key:'h:'+k,value:null})}});sync(it)};
+const pt=c=>(c.poin==null?1:+c.poin)*(c.tipe==='hijau'?1:-1);
+const fp=p=>(p>0?'+':'')+p;
+const poin=(id,f,t)=>db.cards.reduce((a,c)=>c.sid===id&&c.tgl>=f&&c.tgl<=t?a+pt(c):a,0);
+const top20=()=>db.students.map(s=>({s,p:poin(s.id,'0000-00-00','9999-12-31')})).filter(x=>x.p>0).sort((a,b)=>b.p-a.p||a.s.nama.localeCompare(b.s.nama)).slice(0,20);
+const rank=id=>top20().findIndex(x=>x.s.id===id)+1;
+const setCfg=(pp,kk)=>{db.cfg={poin:pp,kuning:kk};sync([{key:'g:cfg',value:db.cfg}])};
+const warn=s=>{const c=db.cfg||{},r=[];
+ if(c.poin!=null){const p=poin(s.id,'0000-00-00','9999-12-31');if(p<=c.poin)r.push('Total poin '+fp(p)+' (batas '+fp(c.poin)+')')}
+ if(c.kuning!=null&&c.kuning>0){const ym=today().slice(0,7),k=db.cards.filter(x=>x.sid===s.id&&x.tipe==='kuning'&&x.tgl.slice(0,7)===ym).length;if(k>=c.kuning)r.push(k+' kartu kuning bulan ini (batas '+c.kuning+')')}
+ return r};
+function backup(){
+ if(typeof XLSX==='undefined'){toast('Library Excel belum termuat. Coba saat online.');return}
+ const sd={};db.students.forEach(s=>sd[s.id]=s);
+ const W=(rows,w)=>{const x=XLSX.utils.aoa_to_sheet(rows);x['!cols']=w.map(n=>({wch:n}));return x};
+ const wb=XLSX.utils.book_new(),J=t=>t==='kuning'?'Yellow':'Green';
+ XLSX.utils.book_append_sheet(wb,W([['Nama','Kelas','Kamar'],...db.students.map(s=>[s.nama,s.kelas,s.kamar||''])],[24,8,8]),'Siswa');
+ const ab=[['Tanggal','Kegiatan','Nama','Kelas','Status','Catatan','Pembina piket']];
+ Object.keys(db.att).sort().forEach(k=>{const p=k.split('|'),s=sd[p[2]],r=db.att[k];if(s)ab.push([p[0],p[1],s.nama,s.kelas,r.s,r.n||'',r.by||''])});
+ XLSX.utils.book_append_sheet(wb,W(ab,[12,16,24,8,10,30,24]),'Absensi');
+ const kt=[['Date','Name','Class','Type','Category','Points','Note','Supervisor'],...[...db.cards].sort((a,b)=>a.tgl.localeCompare(b.tgl)).map(c=>{const s=sd[c.sid]||{};return [c.tgl,s.nama||'(deleted)',s.kelas||'',J(c.tipe),c.kat,pt(c),c.n||'',c.by||'']})];
+ XLSX.utils.book_append_sheet(wb,W(kt,[12,24,8,8,24,8,30,24]),'Cards');
+ XLSX.utils.book_append_sheet(wb,W([['Type','Category','Points'],...db.cats.map(c=>[J(c.tipe),c.nama,c.poin==null?1:c.poin])],[10,28,8]),'Categories');
+ XLSX.utils.book_append_sheet(wb,W([['Tanggal','Piket Pagi','Piket Malam'],...Object.keys(db.piket).sort().map(d=>[d,pkv(d,0),pkv(d,1)])],[12,24,24]),'Piket');
+ const cl=[['Date','Room','Score','Max','%','Not met','Note','Inspector'],...Object.keys(db.clean).sort().map(k=>{const q=k.split('|'),v=db.clean[k];return [q[0],roomNo(q[1]),cscore(v.c),MAXC,Math.round(cscore(v.c)/MAXC*100),missList(v).join(', '),v.n||'',v.by||'']})];
+ XLSX.utils.book_append_sheet(wb,W(cl,[12,12,8,8,8,50,30,20]),'Cleanliness');
+ XLSX.writeFile(wb,'cadangan-asrama_'+today()+'.xlsx');LS('bk',today());toast('Cadangan diunduh');
+ if(tab==='Dashboard'&&!modalOpen())go();
+}
+
+/* ---------- login ---------- */
+function showLogin(msg){
+ $('#nav').innerHTML='';$('#bnav').innerHTML='';$('#out').hidden=true;$('#fab').hidden=true;$('#ov').classList.remove('on');setSt();
+ const bad=!window.CFG||!CFG.url||CFG.url.includes('XXXX');
+ $('#view').innerHTML=`<div class="login card"><h2>Masuk</h2>
+ ${bad?'<p class="err">Aplikasi belum disambungkan ke database. Isi config.js sesuai panduan.</p>':`<label>Kode akses<input id="c" type="password" autocomplete="current-password"></label>
+ <p class="err" id="e">${esc(msg||'')}</p><button class="btn pri" id="go">Masuk</button>`}</div>`;
+ if(bad)return;
+ const run=async()=>{const c=$('#c').value.trim();if(!c)return;$('#e').textContent='Memeriksa…';
+  try{const rows=await rpc('kv_list',{p_code:c});code=c;LS('code',c);db=fromRows(rows);LS('db',db);boot()}
+  catch(e){$('#e').textContent=e.forbidden?'Kode akses salah.':'Tidak bisa terhubung ('+(e.status||'jaringan')+'): '+String(e.message).slice(0,160)}};
+ $('#go').onclick=run;$('#c').onkeydown=e=>{if(e.key==='Enter')run()};
+}
+$('#out').onclick=()=>{if(q.length&&!confirm('Masih ada data belum terkirim. Tetap keluar?'))return;LS('db',null);db={students:[],att:{},piket:{},cats:[],cards:[],cfg:{},rooms:[],clean:{},acts:[]};logout('')};
+
+/* ---------- navigasi ---------- */
+const TABS=['Dashboard','Rekap','Monitoring Siswa','Kebersihan','Weekly Report'];
+let tab='Dashboard';
+const A={date:today(),act:'Belajar Mandiri',kelas:'',draft:null,shown:false};
+const K={tgl:today(),sid:'',tipe:'kuning'};
+let monSel='';
+const NAVI={'Dashboard':['📊','Beranda','Beranda'],'Rekap':['📄','Rekap','Rekap'],'Monitoring Siswa':['🎓','Monitoring Siswa','Monitoring'],'Kebersihan':['🧹','Kebersihan','Kebersihan'],'Weekly Report':['📝','Weekly Report','Report']};
+function nav(){
+ const mk=i=>TABS.map(t=>`<button class="${t===tab?'on':''}" data-t="${t}"><span class="ic" aria-hidden="true">${NAVI[t][0]}</span> <span>${NAVI[t][i]}</span></button>`).join('');
+ $('#nav').innerHTML=mk(1);$('#bnav').innerHTML=mk(2);
+}
+const navClick=e=>{const b=e.target.closest('button');if(b&&b.dataset.t){if(b.dataset.t==='Weekly Report'){location.href='report.html';return}tab=b.dataset.t;window.scrollTo(0,0);go()}};
+$('#nav').onclick=navClick;$('#bnav').onclick=navClick;
+const bot10=()=>db.students.map(s=>({s,p:poin(s.id,'0000-00-00','9999-12-31')})).filter(x=>x.p<0).sort((a,b)=>a.p-b.p).slice(0,10);
+function tickClock(){
+ const a=$('#rtd'),b=$('#rtc');if(!a||!b)return;
+ const loc={id:'id-ID',en:'en-GB',tr:'tr-TR'}[lang]||'id-ID',now=new Date();
+ const set=(el,v)=>{if(el.firstChild&&el.firstChild.nodeType===3){if(el.firstChild.nodeValue!==v)el.firstChild.nodeValue=v}else el.textContent=v};
+ set(a,now.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Jakarta'}));
+ set(b,now.toLocaleTimeString('en-GB',{hour12:false,timeZone:'Asia/Jakarta'})+' WIB');
+}
+setInterval(tickClock,1000);
+function go(){if(!code)return;nav();({'Dashboard':dash,'Rekap':rekap,'Monitoring Siswa':monitor,'Kebersihan':cleanPage})[tab]()}
+
+/* ---------- dashboard ---------- */
+function dash(){
+ const d=today(),n=db.students.length,ym=d.slice(0,7);
+ const SEV={Alpa:0,Sakit:1,Izin:2,Telat:3},SO=window.SO=window.SO||{},sdv=window.SD||d;
+ const srow=(x,st)=>`<tr><td>${esc(x.nama)}</td><td>${esc(x.kelas)}</td><td>${esc(x.kamar||'-')}</td><td>${st}</td></tr>`;
+ const sumH=ACTN().map(a=>{
+  const rs=db.students.map(x=>({s:x,r:rec(sdv,a,x.id)})),got=rs.filter(x=>x.r),none=rs.filter(x=>!x.r);
+  const late=got.filter(x=>x.r.s==='Telat'),ok=got.filter(x=>GOOD.includes(x.r.s)).length+late.length,miss=got.filter(x=>!GOOD.includes(x.r.s)&&x.r.s!=='Telat').sort((p,q)=>(SEV[p.r.s]!==undefined?SEV[p.r.s]:9)-(SEV[q.r.s]!==undefined?SEV[q.r.s]:9));
+  if(!got.length)return `<div class="card"><b>${esc(a)}</b> <span class="pill n">Belum ada absensi</span></div>`;
+  const body=[...miss,...late].map(x=>srow(x.s,`<span class="pill ${x.r.s==='Alpa'?'r':x.r.s==='Sakit'?'b':x.r.s==='Izin'?'c':'y'}">${esc(x.r.s)}</span>${x.r.n?` <span class="mut">${esc(x.r.n)}</span>`:''}`)).join('')+none.map(x=>srow(x.s,'<span class="pill n">Belum diabsen</span>')).join('');
+  const key=sdv+'|'+a,op=SO[key]!==undefined?SO[key]:(miss.length>0||late.length>0||none.length>0);
+  return `<details class="card" data-sa="${esc(key)}"${op?' open':''}><summary><b>${esc(a)}</b><span class="pill g"><span>Hadir</span> ${ok}</span><span class="pill r"><span>Tidak hadir</span> ${miss.length}</span>${late.length?`<span class="pill y"><span>Telat</span> ${late.length}</span>`:''}${none.length?`<span class="pill n"><span>Belum diabsen</span> ${none.length}</span>`:''}</summary>${body?`<div class="tw" style="margin:10px 0 0"><table><tr><th>Nama</th><th>Kelas</th><th>Kamar</th><th>Status</th></tr>${body}</table></div>`:'<div class="bn ok" style="margin:10px 0 0">Semua siswa hadir.</div>'}</details>`}).join('')||'<div class="bn">Belum ada kegiatan.</div>';
+ const SC=s=>s==='Alpa'?'r':s==='Sakit'?'b':s==='Izin'?'c':'y',hlA=actsList().filter(a=>a.sorot==='1'),hlR=[];
+ const hlS=hlA.map(a=>{
+  const rs=db.students.map(x=>({s:x,r:rec(sdv,a.nama,x.id)})),got=rs.filter(x=>x.r),bad=got.filter(x=>!GOOD.includes(x.r.s)).sort((p,q)=>(SEV[p.r.s]!==undefined?SEV[p.r.s]:9)-(SEV[q.r.s]!==undefined?SEV[q.r.s]:9)||p.s.nama.localeCompare(q.s.nama)),none=rs.length-got.length,cn={};
+  bad.forEach(x=>{cn[x.r.s]=(cn[x.r.s]||0)+1;hlR.push({a:a.nama,s:x.s,r:x.r})});
+  const pills=Object.keys(SEV).filter(k=>cn[k]).map(k=>`<span class="pill ${SC(k)}"><span>${k}</span> ${cn[k]}</span>`).join('');
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0"><b>${esc(a.nama)}</b>${got.length?`<span class="pill g"><span>Hadir</span> ${got.length-bad.length}</span>${pills}`:'<span class="pill n">Belum ada absensi</span>'}${got.length&&none?`<span class="pill n"><span>Belum diabsen</span> ${none}</span>`:''}</div>`}).join('');
+ const hlH=hlA.length?`<div class="card" style="border-left:4px solid #f59e0b"><h3 style="margin:0 0 4px">⭐ Sorotan Pagi${sdv!==d?' · '+sdv:''}</h3>${hlS}${hlR.length?`<div class="tw" style="margin:10px 0 0"><table><tr><th>Nama</th><th>Kelas</th><th>Kamar</th><th>Kegiatan</th><th>Status</th></tr>${hlR.map(x=>`<tr><td>${esc(x.s.nama)}</td><td>${esc(x.s.kelas)}</td><td>${esc(x.s.kamar||'-')}</td><td>${esc(x.a)}</td><td><span class="pill ${SC(x.r.s)}">${esc(x.r.s)}</span>${x.r.n?` <span class="mut">${esc(x.r.n)}</span>`:''}</td></tr>`).join('')}</table></div>`:'<div class="bn ok" style="margin:10px 0 0">Tidak ada yang telat, sakit, izin, atau alpa.</div>'}</div>`:'';
+ const cm=db.cards.filter(c=>c.tgl.slice(0,7)===ym),ky=cm.filter(c=>c.tipe==='kuning').length,mp=cm.reduce((a,c)=>a+pt(c),0);
+ const cnt={};db.cats.forEach(c=>cnt[c.tipe+'|'+c.nama]=0);cm.forEach(c=>{const k=c.tipe+'|'+c.kat;cnt[k]=(cnt[k]||0)+1});
+ const crow=Object.keys(cnt).sort().map(k=>{const i=k.indexOf('|');return `<tr><td>${esc(k.slice(i+1))}</td><td>${jenis(k.slice(0,i))}</td><td>${cnt[k]}</td></tr>`}).join('')||'<tr><td colspan="3" class="empty">No categories yet. Open ＋ Input Data → Categories.</td></tr>';
+ const RO=window.RO||0,cy=perRange('w2',RO),oldest=db.cards.reduce((m,c)=>c.tgl<m?c.tgl:m,'9999-99-99'),lbc=lbAll(cy.from,cy.to),loc2={id:'id-ID',en:'en-GB',tr:'tr-TR'}[lang]||'id-ID';
+ const fdt=v=>new Date(U(v)).toLocaleDateString(loc2,{day:'numeric',month:'short',timeZone:'UTC'});
+ const rk=k=>{const l=lbc.filter(x=>x[k]>0).sort((p,q)=>q[k]-p[k]||p.s.nama.localeCompare(q.s.nama)).slice(0,5);
+  return l.length?`<div class="tw"><table><tr><th>#</th><th>Nama</th><th>Kelas</th><th>Kamar</th><th>Poin</th></tr>${l.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.s.nama)}</td><td>${esc(x.s.kelas)}</td><td>${esc(x.s.kamar||'-')}</td><td><b>${x[k]}</b></td></tr>`).join('')}</table></div>`:'<div class="bn">Belum ada kartu pada periode ini.</div>'};
+ const rkT=()=>{const l=lbc.filter(x=>x.t>0).sort((p,q)=>q.t-p.t||p.s.nama.localeCompare(q.s.nama)).slice(0,5);
+  return l.length?`<div class="tw"><table><tr><th>#</th><th>Nama</th><th>Kelas</th><th>Kamar</th><th>Poin</th></tr>${l.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.s.nama)}</td><td>${esc(x.s.kelas)}</td><td>${esc(x.s.kamar||'-')}</td><td><b>${fp(x.t)}</b></td></tr>`).join('')}</table></div>`:'<div class="bn">Belum ada poin positif pada periode ini.</div>'};
+ const topN=(lb,k,n)=>lb.filter(x=>x[k]>0).sort((p,q)=>q[k]-p[k]||p.s.nama.localeCompare(q.s.nama)).slice(0,n).map(x=>esc(x.s.nama)+' ('+x[k]+')').join(', ')||'-';
+ const hist=[];for(let o=-1;o>=-12;o--){const pr=perRange('w2',o);if(pr.to<oldest)break;const lb=lbAll(pr.from,pr.to);hist.push(`<tr><td>${fdt(pr.from)} – ${fdt(pr.to)}</td><td>${topN(lb,'g',3)}</td><td>${topN(lb,'y',3)}</td></tr>`)}
+ const histH=`<details class="card"><summary><b>Riwayat juara tiap siklus</b></summary>${hist.length?`<div class="tw" style="margin:10px 0 0"><table><tr><th>Periode</th><th>🟩 Hijau teratas</th><th>🟨 Kuning teratas</th></tr>${hist.join('')}</table></div>`:'<div class="bn" style="margin:10px 0 0">Belum ada riwayat siklus.</div>'}</details>`;
+ const rankH=`<h3>Peringkat Kartu (2 Minggu)</h3><div class="row" style="align-items:center;margin:0 0 8px;gap:8px"><button class="btn sec" id="rkp"${cy.from<=oldest?' disabled':''}>◀</button><div style="flex:1;text-align:center"><b>${fdt(cy.from)} – ${fdt(cy.to)}</b><div class="mut">${RO===0?'Siklus ini':'Siklus sebelumnya'}</div></div><button class="btn sec" id="rkn"${RO>=0?' disabled':''}>▶</button></div>
+ <h3>🟨 5 Kartu Kuning Terbanyak</h3>${rk('y')}<h3>🟩 5 Kartu Hijau Terbanyak</h3>${rk('g')}<h3>🏆 5 Poin Terbanyak (Hijau − Kuning)</h3>${rkT()}
+ ${histH}
+ <p class="mut">Periode 2 minggu diatur di Rekap → Awal siklus 2 mingguan.</p>`;
+ const hs=Object.keys(db.clean).filter(k=>k.startsWith(d+'|')).map(k=>({id:k.split('|')[1],v:cscore(db.clean[k].c)})),havg=hs.length?hs.reduce((a,x)=>a+x.v,0)/hs.length:null,low=hs.length?hs.reduce((m,x)=>x.v<m.v?x:m):null;
+ $('#view').innerHTML=`${hlH}<div class="rt"><div><p class="sm">Tanggal Real-Time</p><h2 id="rtd">…</h2></div><div class="rtr"><p class="sm">Waktu Live</p><p class="clock" id="rtc">00:00:00 WIB</p></div></div>
+ <div class="card"><div class="g2"><div><p class="mut">Piket Pagi</p><h2 class="h2s">${esc(pkv(d,0)||'Belum diisi')}</h2></div><div><p class="mut">Piket Malam</p><h2 class="h2s">${esc(pkv(d,1)||'Belum diisi')}</h2></div></div></div>
+ <h3>Summary harian</h3>
+ <div class="row" style="margin:0 0 8px;align-items:center;gap:8px"><input type="date" id="sd" value="${sdv}" max="${d}" style="flex:1">${sdv!==d?'<button class="btn sec" id="sdt">Hari ini</button>':''}</div>
+ ${sumH}
+ <h3>Kebersihan kamar hari ini</h3>
+ <div class="g3"><div class="card"><div class="big">${hs.length}/${db.rooms.length}</div><div class="mut">Kamar diperiksa hari ini</div></div><div class="card"><div class="big">${havg==null?'-':havg.toFixed(1)}</div><div class="mut">Rata-rata skor hari ini</div></div><div class="card"><div class="big" style="font-size:1.05rem;padding:.3rem 0">${low?esc(roomNo(low.id))+' · '+low.v+'/'+MAXC:'-'}</div><div class="mut">Skor terendah hari ini</div></div></div>
+ ${rankH}
+ <div data-nt><h3>Cards this month</h3>
+ <div class="g3"><div class="card ky"><div class="big">${ky}</div><div class="mut">🟨 Yellow Card</div></div><div class="card hj"><div class="big">${cm.length-ky}</div><div class="mut">🟩 Green Card</div></div><div class="card"><div class="big">${fp(mp)}</div><div class="mut">Total points this month</div></div></div>
+ <div class="tw"><table><tr><th>Category</th><th>Type</th><th>This month</th></tr>${crow}</table></div></div>
+ <div class="card"><h3 style="margin-top:0">Cadangan data</h3><button class="btn sec" id="bk"><span>⬇ Cadangkan semua data (Excel)</span></button><p class="mut" style="margin:8px 0 0">Cadangan terakhir di perangkat ini: ${esc(LS('bk')||'belum pernah')}. Disarankan sekali seminggu.</p></div>`;
+ $('#bk').onclick=backup;$('#sd').onchange=()=>{const v=$('#sd').value;window.SD=v&&v<d?v:null;dash()};if($('#sdt'))$('#sdt').onclick=()=>{window.SD=null;dash()};$('#rkp').onclick=()=>{window.RO=RO-1;dash()};$('#rkn').onclick=()=>{window.RO=Math.min(0,RO+1);dash()};$('#view').querySelectorAll('details[data-sa]').forEach(e=>e.ontoggle=()=>{SO[e.dataset.sa]=e.open});tickClock();
+}
+
+/* ---------- popup input data ---------- */
+const MT=['Absensi','Kartu','Siswa','Kegiatan','Kategori','Kebersihan'];const MLBL={Kartu:'Cards',Kategori:'Categories'};let mt='Absensi';
+const ov=$('#ov');
+function modalOpen(){return ov.classList.contains('on')}
+function openM(t){if(t)mt=t;if(A.dt0!==today()){A.dt0=today();A.date=today();A.shown=false;K.tgl=today()}ov.classList.add('on');renderM()}
+function closeM(){ov.classList.remove('on');go()}
+const LOCKED=['Siswa','Kegiatan','Kategori'];
+function fLock(){
+ $('#mb').innerHTML=`<div class="card" style="text-align:center"><div style="font-size:2rem">🔒</div><h3 style="margin:6px 0">Hanya admin</h3><p class="mut">Tab ini hanya bisa diisi oleh admin. Masukkan kode admin untuk membuka.</p>
+ <label style="max-width:260px;margin:0 auto">Kode admin<input id="adc" type="password" autocomplete="off"></label><p class="err" id="ade"></p><button class="btn pri" id="adg">Buka</button></div>`;
+ const go=async()=>{const v=$('#adc').value.trim();if(!v)return;$('#ade').textContent='Memeriksa…';
+  try{const ok=await rpc('kv_admin_check',{p_code:code,p_admin:v});if(ok===true){ADM=v;LS('adm',v);renderM()}else $('#ade').textContent='Kode admin salah.'}
+  catch(e){$('#ade').textContent=(e.status===404||/PGRST202|Could not find/.test(e.message||''))?'Fitur admin belum aktif di database. Jalankan update-admin.sql di Supabase.':'Tidak bisa terhubung. Coba lagi.'}};
+ $('#adg').onclick=go;$('#adc').onkeydown=e=>{if(e.key==='Enter')go()};
+}
+function renderM(){$('#mn').innerHTML=MT.map(t=>`<button class="${t===mt?'on':''}" data-t="${t}" ${MLBL[t]?'data-nt':''}>${MLBL[t]||t}</button>`).join('');const L=LOCKED.includes(mt);$('#admbar').hidden=!(L&&ADM);
+ if(L&&!ADM)fLock();else ({Absensi:fAbsen,Kartu:fKartu,Siswa:fSiswa,Kegiatan:fKeg,Kategori:fKat,Kebersihan:fClean})[mt]()}
+$('#adl').onclick=()=>{ADM='';LS('adm',null);renderM()};
+$('#mn').onclick=e=>{const t=e.target.dataset.t;if(t){mt=t;renderM()}};
+$('#fab').onclick=()=>openM();$('#abtn').onclick=openAbout;$('#mx').onclick=closeM;ov.onclick=e=>{if(e.target===ov)closeM()};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&modalOpen())closeM()});
+
+/* absensi */
+const shownStudents=()=>db.students.filter(s=>!A.kelas||s.kelas===A.kelas);
+function loadDraft(){A.draft={};shownStudents().forEach(s=>{const r=rec(A.date,A.act,s.id);if(r)A.draft[s.id]={s:r.s,n:r.n||''}});A.shown=true}
+function fAbsen(){
+ if(!ACTN().includes(A.act))A.act=ACTN()[0]||'';
+ $('#mb').innerHTML=`<div class="tip">Pilih tanggal, piket, dan kegiatan, lalu ketuk ikon status tiap siswa (ketuk lagi untuk batal), atau pakai "Isi Semua". Tekan Simpan Absensi agar terkirim ke semua perangkat.</div>
+ <div class="row"><label>Tanggal<input type="date" id="ad" value="${A.date}"></label>
+ <label>Piket Pagi<input id="apk" placeholder="Nama pembina" value="${esc(pkv(A.date,0))}"></label>
+ <label>Piket Malam<input id="apk2" placeholder="Nama pembina" value="${esc(pkv(A.date,1))}"></label></div>
+ <div class="row"><label>Kegiatan<select id="aa">${ACTN().map(a=>`<option value="${a}" ${a===A.act?'selected':''}>${a}</option>`).join('')}</select></label>
+ <label>Kelas<select id="ak">${kelasOpts(A.kelas,true)}</select></label></div>
+ <div class="row"><button class="btn pri" id="ashow">Tampilkan</button><button class="btn sec" id="aall">✓ Isi Semua</button></div>
+ <div id="aedit"></div><div id="alist"></div>
+ <div class="savebar"><button class="btn pri" id="asv">Simpan Absensi</button></div>`;
+ const reset=()=>{A.shown=false;$('#alist').innerHTML=''};
+ $('#ad').onchange=e=>{A.date=e.target.value;$('#apk').value=pkv(A.date,0);$('#apk2').value=pkv(A.date,1);reset()};
+ $('#aa').onchange=e=>{A.act=e.target.value;reset()};
+ $('#ak').onchange=e=>{A.kelas=e.target.value;reset()};
+ const sp=()=>{const a=$('#apk').value.trim(),b=$('#apk2').value.trim();if(a!==pkv(A.date,0)||b!==pkv(A.date,1))setPiket(A.date,a,b)};$('#apk').onchange=sp;$('#apk2').onchange=sp;
+ $('#ashow').onclick=()=>{loadDraft();aList()};
+ $('#aall').onclick=()=>{if(!A.shown)loadDraft();const f=stSet(A.act)[0][0];shownStudents().forEach(s=>{A.draft[s.id]={s:f,n:(A.draft[s.id]||{}).n||''}});aList()};
+ $('#asv').onclick=()=>{
+  if(!A.shown){toast('Tekan Tampilkan dulu');return}
+  const p1=$('#apk').value.trim(),p2=$('#apk2').value.trim(),mor=isMorning(A.act),pk=mor?p1:p2;
+  if(!pk){toast(mor?'Isi nama piket pagi dulu':'Isi nama piket malam dulu');(mor?$('#apk'):$('#apk2')).focus();return}
+  sp();
+  const it=[];
+  shownStudents().forEach(s=>{const k=A.date+'|'+A.act+'|'+s.id,r=A.draft[s.id];
+   if(r&&r.s){const v={s:r.s,n:r.n||'',by:pk};db.att[k]=v;it.push({key:'a:'+k,value:v})}
+   else if(db.att[k]){delete db.att[k];it.push({key:'a:'+k,value:null})}});
+  shownStudents().forEach(s=>{const r=A.draft[s.id],nm=r&&r.s?autoCat(A.act,r.s):null,id='auto|'+A.date+'|'+A.act+'|'+s.id,ix=db.cards.findIndex(c=>c.id===id);
+   if(nm){const c=ensureCat(nm),v={tgl:A.date,sid:s.id,tipe:'kuning',kat:c.nama,poin:c.poin==null?1:c.poin,n:'Auto · '+A.act+' · '+r.s,by:pk,auto:1};
+    if(ix>=0)db.cards[ix]={id,...v};else db.cards.push({id,...v});it.push({key:'k:'+id,value:v})}
+   else if(ix>=0){db.cards.splice(ix,1);it.push({key:'k:'+id,value:null})}});
+  if(it.length)sync(it);flush().then(()=>toast(q.length?'Tersimpan di HP, dikirim saat online'+(LASTERR?' — Error: '+LASTERR:''):'Absensi tersimpan'))};
+ if(A.shown)aList();
+}
+function aList(){
+ const n0=shownStudents().filter(x=>rec(A.date,A.act,x.id)).length;$('#aedit').innerHTML=n0?'<div class="bn">✏️ Absensi untuk tanggal dan kegiatan ini sudah tersimpan. Perubahan akan menimpa data sebelumnya.</div>':'';
+ const set=stSet(A.act),ss=shownStudents();
+ if(!ss.length){$('#alist').innerHTML='<div class="empty">Belum ada siswa. Tambahkan di tab Siswa.</div>';return}
+ $('#alist').innerHTML=ss.map(s=>{const r=A.draft[s.id]||{};
+  return `<div class="card stu" data-id="${s.id}"><div><span class="nm">${esc(s.nama)}</span><div class="mt">Kelas ${esc(s.kelas)} · Kamar ${esc(s.kamar||'-')}</div></div>
+  <div class="sts">${set.map(x=>`<button class="st ${x[2]} ${r.s===x[0]?'on':''}" data-s="${x[0]}"><b>${x[1]}</b>${x[0]}</button>`).join('')}</div>
+  <input placeholder="Catatan" value="${esc(r.n||'')}"></div>`}).join('');
+}
+$('#mb').addEventListener('click',e=>{
+ const b=e.target.closest('.st');if(!b||mt!=='Absensi')return;
+ const id=b.closest('.stu').dataset.id,cur=A.draft[id]||{s:'',n:''};
+ A.draft[id]={s:cur.s===b.dataset.s?'':b.dataset.s,n:cur.n||''};aList();
+});
+$('#mb').addEventListener('input',e=>{
+ if(mt!=='Absensi'||!e.target.closest('.stu'))return;
+ const id=e.target.closest('.stu').dataset.id,cur=A.draft[id]||{s:'',n:''};cur.n=e.target.value;A.draft[id]=cur;
+});
+
+/* kartu kuning / hijau (English only) */
+function fKartu(){
+ if(!db.students.some(s=>s.id===K.sid))K.sid=(db.students[0]||{}).id||'';
+ const cs=db.cats.filter(c=>c.tipe===K.tipe);
+ K.f=K.f||'';K.edit=K.edit||'';
+ const recent=[...db.cards].filter(c=>!K.f||c.sid===K.f).sort((a,b)=>b.tgl.localeCompare(a.tgl)).slice(0,30).map(c=>{const s=db.students.find(x=>x.id===c.sid),au=String(c.id).startsWith('auto|');
+  return `<tr><td>${c.tgl}</td><td>${s?esc(s.nama):'-'}</td><td>${jenis(c.tipe)}</td><td>${esc(c.kat)}</td><td>${fp(pt(c))}</td><td>${au?'<span class="mut">Auto</span> ':`<button class="btn" data-kedit="${esc(c.id)}">Edit</button> `}<button class="btn del" data-kdel="${esc(c.id)}">Delete</button></td></tr>`}).join('');
+ const ec=K.edit?db.cards.find(c=>c.id===K.edit):null,ecs=ec?db.cats.filter(c=>c.tipe===ec.tipe&&c.nama!==ec.kat):[];
+ const editHtml=ec?`<div class="card" style="border-color:var(--pri)"><b>Edit card · ${esc((db.students.find(x=>x.id===ec.sid)||{}).nama||'-')} · ${jenis(ec.tipe)}</b>
+ <div class="row" style="margin-top:8px"><label>Date<input type="date" id="ed" value="${ec.tgl}"></label><label>Category<select id="ek"><option value="__cur">${esc(ec.kat)} (${ec.poin==null?1:ec.poin} pts)</option>${ecs.map(c=>`<option value="${c.id}">${esc(c.nama)} (${c.poin==null?1:c.poin} pts)</option>`).join('')}</select></label></div>
+ <div class="row"><label style="flex:1">Note<input id="en2" value="${esc(ec.n||'')}"></label></div>
+ <div class="row"><button class="btn pri" id="eup">Update</button><button class="btn" id="ecn2">Cancel</button></div></div>`:'';
+ $('#mb').innerHTML=`<div data-nt>${editHtml}<div class="row"><label>Date<input type="date" id="kd" value="${K.tgl}"></label>
+ <label>Student<select id="ks">${db.students.map(s=>`<option value="${s.id}" ${s.id===K.sid?'selected':''}>${esc(s.nama)} (${esc(s.kelas)})</option>`).join('')||'<option value="">(no students yet)</option>'}</select></label></div>
+ <div class="row"><label>Type<select id="kj"><option value="kuning" ${K.tipe==='kuning'?'selected':''}>🟨 Yellow Card</option><option value="hijau" ${K.tipe==='hijau'?'selected':''}>🟩 Green Card</option></select></label>
+ <label>Category<select id="kc">${cs.map(c=>`<option value="${c.id}">${esc(c.nama)} (${c.poin==null?1:c.poin} pts)</option>`).join('')||'<option value="">(none yet)</option>'}</select></label></div>
+ ${cs.length?'':'<div class="tip">No categories for this type yet. Add one first in the Categories tab.</div>'}
+ <div class="row"><label style="flex:1">Note<input id="kn"></label></div>
+ <div class="row"><label>Supervisor<input id="kp" value="${esc(pkTxt(K.tgl))}"></label><button class="btn pri" id="ksv">Save card</button></div>
+ <h3>Latest cards</h3><div class="row"><label>Show cards of<select id="kf"><option value="">All students</option>${db.students.map(s=>`<option value="${s.id}" ${s.id===K.f?'selected':''}>${esc(s.nama)} (${esc(s.kelas)})</option>`).join('')}</select></label></div>
+ ${recent?`<div class="tw"><table style="min-width:0"><tr><th>Date</th><th>Student</th><th>Type</th><th>Category</th><th>Points</th><th></th></tr>${recent}</table></div>`:'<div class="empty">No cards yet.</div>'}</div>`;
+ $('#kd').onchange=e=>{K.tgl=e.target.value;$('#kp').value=pkTxt(K.tgl)};
+ $('#ks').onchange=e=>{K.sid=e.target.value};
+ $('#kj').onchange=e=>{K.tipe=e.target.value;fKartu()};
+ $('#ksv').onclick=()=>{
+  const sid=$('#ks').value,c=db.cats.find(x=>x.id===$('#kc').value);
+  if(!sid){toast('Choose a student first');return}
+  if(!c){toast('Choose a category first (add one in the Categories tab)');return}
+  addCard({tgl:K.tgl,sid,tipe:K.tipe,kat:c.nama,poin:c.poin==null?1:c.poin,n:$('#kn').value.trim(),by:$('#kp').value.trim()});
+  toast('Card saved');fKartu()};
+ $('#mb').querySelectorAll('[data-kdel]').forEach(b=>b.onclick=()=>{if(confirm('Delete this card?')){delCard(b.dataset.kdel);fKartu()}});
+ $('#kf').onchange=e=>{K.f=e.target.value;fKartu()};
+ $('#mb').querySelectorAll('[data-kedit]').forEach(b=>b.onclick=()=>{K.edit=b.dataset.kedit;fKartu();$('#mb').scrollTop=0});
+ if(ec){$('#ecn2').onclick=()=>{K.edit='';fKartu()};
+  $('#eup').onclick=()=>{const v=$('#ek').value,nc=v==='__cur'?null:db.cats.find(c=>c.id===v);ec.tgl=$('#ed').value||ec.tgl;if(nc){ec.kat=nc.nama;ec.poin=nc.poin==null?1:nc.poin}ec.n=$('#en2').value.trim();
+   sync([{key:'k:'+ec.id,value:{tgl:ec.tgl,sid:ec.sid,tipe:ec.tipe,kat:ec.kat,poin:ec.poin,n:ec.n,by:ec.by||''}}]);K.edit='';toast('Card updated');fKartu()}}
+}
+
+/* kegiatan */
+const saveAct=a=>({key:'e:'+a.id,value:{nama:a.nama,jenis:a.jenis,shift:a.shift,auto:a.auto||'',urut:a.urut,sorot:a.sorot||''}});
+function matAct(){if(!db.acts.length){db.acts=DEF_ACTS.map((a,i)=>({id:nid(),urut:i,...a}));sync(db.acts.map(saveAct))}}
+const actByName=n=>{matAct();return db.acts.find(x=>x.nama===n)};
+function moveAct(n,d){matAct();db.acts.sort((a,b)=>a.urut-b.urut);const i=db.acts.findIndex(x=>x.nama===n),j=i+d;if(i<0||j<0||j>=db.acts.length)return;
+ const t=db.acts[i].urut;db.acts[i].urut=db.acts[j].urut;db.acts[j].urut=t;db.acts.sort((a,b)=>a.urut-b.urut);sync([saveAct(db.acts[i]),saveAct(db.acts[j])])}
+function renameAct(old,nn){
+ const a=actByName(old);if(!a)return;
+ const up=[],del=[];
+ Object.keys(db.att).forEach(k=>{const p=k.split('|');if(p[1]!==old)return;const nk=p[0]+'|'+nn+'|'+p[2],v=db.att[k];db.att[nk]=v;delete db.att[k];up.push({key:'a:'+nk,value:v});del.push({key:'a:'+k,value:null})});
+ db.cards.forEach(c=>{if(c.auto&&typeof c.id==='string'&&c.id.startsWith('auto|')){const p=c.id.split('|');if(p[2]!==old)return;const oid=c.id;c.id='auto|'+p[1]+'|'+nn+'|'+p[3];if(c.n)c.n=c.n.split(' · ').map((x,i)=>i===1&&x===old?nn:x).join(' · ');const {id,...v}=c;up.push({key:'k:'+c.id,value:v});del.push({key:'k:'+oid,value:null})}});
+ a.nama=nn;if(A.act===old)A.act=nn;if(R.act===old)R.act=nn;
+ const items=[saveAct(a),...up,...del];
+ SEQ++;for(let i=0;i<items.length;i+=300)q.push(items.slice(i,i+300));
+ LS('q',q);LS('db',db);setSt();flush();
+}
+const ORD=['Subuh','Tadarus Pagi','Ngaji Pagi','Pengumpulan HP Pagi','Keberangkatan Sekolah','Magrib','Isya','Tadarus Magrib','Ngaji Magrib','Belajar Mandiri','Belajar Malam','Absensi Malam'];
+function orderActs(){matAct();const ix=a=>{const i=ORD.indexOf(a.nama);return i<0?100+(a.urut||0):i};
+ db.acts.sort((a,b)=>ix(a)-ix(b));db.acts.forEach((a,i)=>a.urut=i);sync(db.acts.map(saveAct))}
+const LEG={'Ngaji Pagi':'Tadarus Pagi','Ngaji Magrib':'Tadarus Magrib','Belajar Malam':'Belajar Mandiri'};
+function fKeg(){
+ const l=actsList(),pend=l.filter(a=>LEG[a.nama]&&!l.some(x=>x.nama===LEG[a.nama]));
+ const rows=l.map((a,i)=>`<div class="card kg" data-n="${esc(a.nama)}"><div class="kgt"><input data-rn value="${esc(a.nama)}" aria-label="Nama kegiatan" style="font-weight:700;flex:1;min-width:0"><span><button class="btn" data-up ${i?'':'disabled'}>▲</button> <button class="btn" data-dn ${i<l.length-1?'':'disabled'}>▼</button> <button class="btn del" data-kdel2>Hapus</button></span></div>
+ <div class="row" style="margin:0"><label>Jenis<select data-f="jenis"><option value="sholat" ${a.jenis==='sholat'?'selected':''}>Sholat</option><option value="biasa" ${a.jenis==='biasa'?'selected':''}>Biasa</option><option value="dua" ${a.jenis==='dua'?'selected':''}>Hadir/Alpa saja</option><option value="telat" ${a.jenis==='telat'?'selected':''}>Hadir/Telat/Izin/Sakit/Alpa</option></select></label>
+ <label>Piket<select data-f="shift"><option value="pagi" ${a.shift==='pagi'?'selected':''}>Piket Pagi</option><option value="malam" ${a.shift==='malam'?'selected':''}>Piket Malam</option></select></label>
+ <label>Sorot di Beranda<select data-f="sorot"><option value="" ${a.sorot==='1'?'':'selected'}>Tidak</option><option value="1" ${a.sorot==='1'?'selected':''}>Ya (hanya yang tidak hadir)</option></select></label>
+ <label style="flex:1">Kartu kuning otomatis<input data-f="auto" value="${esc(a.auto||'')}" placeholder="Nama kategori (kosongkan jika tidak ada)"></label></div></div>`).join('');
+ $('#mb').innerHTML=`${pend.length?`<div class="bn yel"><b>Nama lama terdeteksi.</b> <span>Ngaji → Tadarus, Belajar Malam → Belajar Mandiri. Riwayat absensi ikut dipindahkan.</span><div style="margin-top:8px"><button class="btn pri" id="gleg">Terapkan nama baru</button></div></div>`:''}<div class="tip">Atur kegiatan absensi: tambah, hapus, ubah urutan, jenis, dan piket. Menghapus kegiatan tidak menghapus riwayat absensinya. Kartu kuning otomatis berlaku untuk Telat dan Alpa pada kegiatan sholat, dan untuk Alpa pada kegiatan biasa.</div>${!ACTN().includes('Keberangkatan Sekolah')||!ACTN().includes('Pengumpulan HP Pagi')?'<div style="margin:0 0 10px"><button class="btn pri" id="gq">＋ Tambah Keberangkatan Sekolah &amp; Pengumpulan HP Pagi</button></div>':''}<div style="margin:0 0 10px"><button class="btn sec" id="gord">Urutkan sesuai jadwal harian</button></div><p class="mut">Untuk mengganti nama kegiatan, ketuk nama di kartu lalu ubah. Riwayat absensinya ikut pindah ke nama baru.</p>
+ <div class="card"><div class="row" style="margin:0"><label style="flex:1">Nama kegiatan<input id="gn"></label><label>Jenis<select id="gj"><option value="sholat">Sholat</option><option value="biasa" selected>Biasa</option><option value="dua">Hadir/Alpa saja</option><option value="telat">Hadir/Telat/Izin/Sakit/Alpa</option></select></label>
+ <label>Piket<select id="gs"><option value="pagi">Piket Pagi</option><option value="malam" selected>Piket Malam</option></select></label>
+ <label>Sorot di Beranda<select id="gh"><option value="">Tidak</option><option value="1">Ya (hanya yang tidak hadir)</option></select></label></div>
+ <div class="row" style="margin:10px 0 0"><label style="flex:1">Kartu kuning otomatis<input id="ga" placeholder="Nama kategori (kosongkan jika tidak ada)"></label><button class="btn pri" id="gadd">Tambah</button></div></div>${rows}`;
+ $('#gadd').onclick=()=>{const n=$('#gn').value.trim();if(!n){toast('Isi nama kegiatan');return}
+  if(ACTN().some(x=>x.toLowerCase()===n.toLowerCase())){toast('Nama kegiatan sudah ada');return}
+  matAct();const a={id:nid(),nama:n,jenis:$('#gj').value,shift:$('#gs').value,auto:$('#ga').value.trim(),sorot:$('#gh').value,urut:Math.max(-1,...db.acts.map(x=>x.urut||0))+1};
+  db.acts.push(a);sync([saveAct(a)]);fKeg();toast('Kegiatan ditambahkan')};
+ const nm=el=>el.closest('[data-n]').dataset.n;
+ $('#mb').querySelectorAll('[data-rn]').forEach(i=>i.onchange=()=>{const old=nm(i),v=i.value.trim();
+  if(!v||v===old){i.value=old;return}
+  if(ACTN().some(x=>x!==old&&x.toLowerCase()===v.toLowerCase())){toast('Nama kegiatan sudah ada');i.value=old;return}
+  if(!confirm('Ubah nama kegiatan ini? Riwayat absensinya ikut dipindahkan ke nama baru.')){i.value=old;return}
+  renameAct(old,v);fKeg();toast('Nama kegiatan diubah')});
+ if($('#gq'))$('#gq').onclick=()=>{matAct();let u=Math.max(-1,...db.acts.map(x=>x.urut||0));const it=[['Pengumpulan HP Pagi'],['Keberangkatan Sekolah']].filter(([n])=>!ACTN().includes(n)).map(([n])=>{const a={id:nid(),nama:n,jenis:'telat',shift:'pagi',auto:'',sorot:'1',urut:++u};db.acts.push(a);return saveAct(a)});sync(it);fKeg();toast('Kegiatan ditambahkan')};
+ if($('#gord'))$('#gord').onclick=()=>{if(!confirm('Urutkan kegiatan sesuai jadwal harian (Subuh sampai Absensi Malam)?'))return;orderActs();fKeg();toast('Urutan kegiatan diperbarui')};
+ if($('#gleg'))$('#gleg').onclick=()=>{if(!confirm('Terapkan nama baru? Riwayat absensinya ikut dipindahkan.'))return;pend.forEach(a=>renameAct(a.nama,LEG[a.nama]));fKeg();toast('Nama kegiatan diperbarui')};
+ $('#mb').querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{moveAct(nm(b),-1);fKeg()});
+ $('#mb').querySelectorAll('[data-dn]').forEach(b=>b.onclick=()=>{moveAct(nm(b),1);fKeg()});
+ $('#mb').querySelectorAll('[data-kdel2]').forEach(b=>b.onclick=()=>{if(confirm('Hapus kegiatan ini? Riwayat absensinya tetap tersimpan.')){const a=actByName(nm(b));db.acts=db.acts.filter(x=>x!==a);sync([{key:'e:'+a.id,value:null}]);fKeg()}});
+ $('#mb').querySelectorAll('[data-f]').forEach(i=>i.onchange=()=>{const a=actByName(nm(i));a[i.dataset.f]=i.value.trim();sync([saveAct(a)])});
+}
+
+/* data siswa */
+let EDS=null;
+function fSiswa(){
+ $('#mb').innerHTML=`<div class="row"><label>Nama<input id="sn"></label><label>Kelas<input id="sc" size="5" placeholder="11A"></label><label>Kamar<input id="sm" size="5" placeholder="A-01"></label><button class="btn pri" id="sadd">Tambah</button></div>
+ <details class="card"><summary>Tambah banyak sekaligus</summary><p class="mut">Satu siswa per baris: Nama, Kelas, Kamar</p><textarea id="sbt" rows="5" style="width:100%" placeholder="Ahmad Fauzan, 11A, A-01"></textarea><p><button class="btn sec" id="sbulk">Tambah semua</button></p></details>
+ <div class="tw"><table style="min-width:0"><tr><th>Nama</th><th>Kelas</th><th>Kamar</th><th></th></tr>
+ ${db.students.map(s=>s.id===EDS?`<tr><td><input id="en" value="${esc(s.nama)}" style="width:100%"></td><td><input id="ec" value="${esc(s.kelas)}" size="4"></td><td><input id="em" value="${esc(s.kamar||'')}" size="5"></td><td><button class="btn pri" id="esv">Simpan</button> <button class="btn" id="ecn">Batal</button></td></tr>`:`<tr><td>${esc(s.nama)}</td><td>${esc(s.kelas)}</td><td>${esc(s.kamar||'')}</td><td><button class="btn" data-eedit="${s.id}">Edit</button> <button class="btn del" data-del="${s.id}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">Belum ada data.</td></tr>'}</table></div>`;
+ $('#sadd').onclick=()=>{const n=$('#sn').value.trim(),c=$('#sc').value.trim().toUpperCase(),m=$('#sm').value.trim().toUpperCase();
+  if(!n||!c){toast('Nama dan kelas wajib diisi');return}addStu([[n,c,m]]);fSiswa();toast('Siswa ditambahkan')};
+ $('#sbulk').onclick=()=>{const L=$('#sbt').value.split('\n').map(x=>x.split(/[,;\t]/).map(y=>y.trim())).filter(x=>x[0]&&x[1]).map(x=>[x[0],x[1].toUpperCase(),(x[2]||'').toUpperCase()]);
+  if(!L.length){toast('Format: Nama, Kelas, Kamar');return}addStu(L);fSiswa();toast(L.length+' siswa ditambahkan')};
+ $('#mb').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(confirm('Hapus siswa ini beserta semua data absensi dan kartunya?')){delStu(b.dataset.del);if(EDS===b.dataset.del)EDS=null;fSiswa()}});
+ $('#mb').querySelectorAll('[data-eedit]').forEach(b=>b.onclick=()=>{EDS=b.dataset.eedit;fSiswa()});
+ if(EDS&&$('#ecn')){$('#ecn').onclick=()=>{EDS=null;fSiswa()};
+  $('#esv').onclick=()=>{const t=db.students.find(x=>x.id===EDS);if(!t){EDS=null;fSiswa();return}
+   const n=$('#en').value.trim(),c=$('#ec').value.trim().toUpperCase(),m=$('#em').value.trim().toUpperCase();
+   if(!n||!c){toast('Nama dan kelas wajib diisi');return}
+   t.nama=n;t.kelas=c;t.kamar=m;db.students.sort(stuCmp);sync([{key:'s:'+t.id,value:{nama:n,kelas:c,kamar:m}}]);EDS=null;fSiswa();toast('Data siswa diperbarui')}}
+}
+
+/* kategori kartu (English only) */
+function fKat(){
+ const g=t=>db.cats.filter(c=>c.tipe===t).map(c=>`<tr><td>${esc(c.nama)}</td><td><input type="number" min="1" value="${c.poin==null?1:c.poin}" data-cpt="${c.id}" style="width:70px"> pts</td><td><button class="btn del" data-cdel="${c.id}">Delete</button></td></tr>`).join('')||'<tr><td colspan="3" class="empty">None yet.</td></tr>';
+ $('#mb').innerHTML=`<div data-nt><div class="tip">Fill in the categories and their points yourself. Green cards add points, yellow cards subtract. Total points = green points − yellow points. Recorded cards stay safe even if their category is deleted. Yellow cards are also created automatically from attendance (late or absent at prayers, absent at Quran study or study hall); you can change the points of those categories here.</div>
+ <div class="row"><label>Type<select id="cj"><option value="kuning">🟨 Yellow Card</option><option value="hijau">🟩 Green Card</option></select></label>
+ <label style="flex:1">Category name<input id="cn"></label><label>Points<input id="cp" type="number" min="1" value="1" style="width:80px"></label><button class="btn pri" id="cadd">Add</button></div>
+ <h3>🟨 Yellow Card categories</h3><div class="tw"><table style="min-width:0">${g('kuning')}</table></div>
+ <h3>🟩 Green Card categories</h3><div class="tw"><table style="min-width:0">${g('hijau')}</table></div></div>`;
+ $('#cadd').onclick=()=>{const n=$('#cn').value.trim();if(!n){toast('Enter a category name');return}addCat(n,$('#cj').value,Math.max(1,parseInt($('#cp').value)||1));fKat();toast('Category added')};
+ $('#mb').querySelectorAll('[data-cdel]').forEach(b=>b.onclick=()=>{if(confirm('Delete this category?')){delCat(b.dataset.cdel);fKat()}});
+ $('#mb').querySelectorAll('[data-cpt]').forEach(i=>i.onchange=()=>{const c=db.cats.find(x=>x.id===i.dataset.cpt);if(!c)return;c.poin=Math.max(1,parseInt(i.value)||1);i.value=c.poin;sync([{key:'c:'+c.id,value:{nama:c.nama,tipe:c.tipe,poin:c.poin}}]);toast('Points updated')});
+}
+
+/* kebersihan kamar */
+const CH={date:today(),room:'',c:[],n:'',by:'',loaded:false};
+function chLoad(){const v=db.clean[CH.date+'|'+CH.room];CH.c=v?v.c.slice():CRIT.map(()=>0);CH.n=v?(v.n||''):'';CH.by=v?(v.by||''):(pkv(CH.date,0)||pkv(CH.date,1)||'');CH.loaded=true}
+function fClean(){
+ if(!db.rooms.some(r=>r.id===CH.room)){CH.room=(db.rooms[0]||{}).id||'';CH.loaded=false}
+ if(!CH.loaded)chLoad();
+ const sc=cscore(CH.c);
+ const list=CRIT.map((x,i)=>`<div class="chk ${CH.c[i]>=x[2]?'full':''}"><span class="cn"><b>${i+1}. ${x[0]}</b><em>${x[1]} · max ${x[2]}</em></span><span class="seg">${Array.from({length:x[2]+1},(_,v)=>`<button type="button" data-i="${i}" data-v="${v}" class="${CH.c[i]===v?'on '+(v===0?'z':v>=x[2]?'f':'p'):''}">${v}</button>`).join('')}</span></div>`).join('');
+ const recent=Object.keys(db.clean).sort().reverse().slice(0,8).map(k=>{const q=k.split('|'),v=db.clean[k];return `<tr><td>${q[0]}</td><td>${esc(roomNo(q[1]))}</td><td>${cscore(v.c)}/${MAXC}</td><td><button class="btn del" data-hdel="${k}">Hapus</button></td></tr>`}).join('');
+ $('#mb').innerHTML=`<div class="tip">Pilih nilai tiap kriteria. Kriteria bernilai 2 bisa diberi 0, 1, atau 2; yang bernilai 1 bisa diberi 0 atau 1. Skor dihitung otomatis (maksimal 16).</div>
+ <div class="row"><label>Tanggal<input type="date" id="hd" value="${CH.date}"></label><label>Kamar<select id="hr">${db.rooms.map(r=>`<option value="${r.id}" ${r.id===CH.room?'selected':''}>${esc(r.no)}</option>`).join('')||'<option value="">(belum ada)</option>'}</select></label></div>
+ ${db.rooms.length?'':'<div class="bn red">Belum ada nomor kamar. Tambahkan di bawah (Kelola nomor kamar).</div>'}
+ <div data-nt>${list}</div>
+ <div class="card"><span>Skor</span> <b id="hsn" style="font-size:1.2rem">${sc} / ${MAXC}</b> <span class="mut" id="hsp">(${Math.round(sc/MAXC*100)}%)</span></div>
+ <div class="row"><label style="flex:1">Catatan<input id="hn" value="${esc(CH.n)}"></label><label>Pemeriksa<input id="hb" value="${esc(CH.by)}"></label></div>
+ <div class="row"><button class="btn sec" id="hall">✓ Semua terpenuhi</button><button class="btn pri" id="hsv">Simpan Pemeriksaan</button></div>
+ ${recent?`<h3>Pemeriksaan terbaru</h3><div class="tw"><table style="min-width:0"><tr><th>Tanggal</th><th>Kamar</th><th>Skor</th><th></th></tr>${recent}</table></div>`:''}
+ <details class="card" ${db.rooms.length?'':'open'}><summary>Kelola nomor kamar</summary>
+ <div class="row" style="margin-top:10px"><label>Nomor kamar<input id="rn" placeholder="C-312"></label><button class="btn pri" id="radd">Tambah</button></div>
+ <div class="tw"><table style="min-width:0">${db.rooms.map(r=>`<tr><td>${esc(r.no)}</td><td><button class="btn del" data-rdel="${r.id}">Hapus</button></td></tr>`).join('')||'<tr><td class="empty">Belum ada.</td></tr>'}</table></div></details>`;
+ const upd=()=>{const v=cscore(CH.c);$('#hsn').textContent=v+' / '+MAXC;$('#hsp').textContent='('+Math.round(v/MAXC*100)+'%)'};
+ $('#hd').onchange=e=>{CH.date=e.target.value;CH.loaded=false;fClean()};
+ $('#hr').onchange=e=>{CH.room=e.target.value;CH.loaded=false;fClean()};
+ $('#mb').querySelectorAll('.seg button').forEach(bt=>bt.onclick=()=>{const i=+bt.dataset.i,v=+bt.dataset.v,mx=CRIT[i][2];CH.c[i]=v;
+  const row=bt.closest('.chk');row.classList.toggle('full',v>=mx);row.querySelectorAll('button').forEach(o=>{o.className=(+o.dataset.v===v)?'on '+(v===0?'z':v>=mx?'f':'p'):''});upd()});
+ $('#hn').oninput=e=>{CH.n=e.target.value};$('#hb').oninput=e=>{CH.by=e.target.value};
+ $('#hall').onclick=()=>{CH.c=CRIT.map(x=>x[2]);fClean()};
+ $('#hsv').onclick=()=>{
+  if(!CH.room){toast('Pilih kamar dulu');return}
+  const k=CH.date+'|'+CH.room,v={c:CH.c.slice(),sc:cscore(CH.c),f:2,n:CH.n.trim(),by:CH.by.trim()};
+  db.clean[k]=v;sync([{key:'h:'+k,value:v}]);toast('Pemeriksaan tersimpan');fClean()};
+ $('#radd').onclick=()=>{const no=$('#rn').value.trim().toUpperCase();if(!no){toast('Isi nomor kamar');return}
+  if(db.rooms.some(r=>r.no.toUpperCase()===no)){toast('Nomor kamar sudah ada');return}addRoom(no);CH.loaded=false;fClean();toast('Kamar ditambahkan')};
+ $('#mb').querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{if(confirm('Hapus kamar ini beserta semua data kebersihannya?')){delRoom(b.dataset.rdel);CH.loaded=false;fClean()}});
+ $('#mb').querySelectorAll('[data-hdel]').forEach(b=>b.onclick=()=>{if(confirm('Hapus pemeriksaan ini?')){const k=b.dataset.hdel;delete db.clean[k];sync([{key:'h:'+k,value:null}]);CH.loaded=false;fClean()}});
+}
+const CL={from:today().slice(0,8)+'01',to:today()};
+function cleanPage(){
+ const ks=Object.keys(db.clean).filter(k=>{const d=k.split('|')[0];return d>=CL.from&&d<=CL.to});
+ const by={};ks.forEach(k=>{const id=k.split('|')[1];(by[id]=by[id]||[]).push(db.clean[k])});
+ const rows=db.rooms.map(r=>{const l=by[r.id]||[];return{r,n:l.length,avg:l.length?l.reduce((a,v)=>a+cscore(v.c),0)/l.length:null}}).sort((a,b)=>(b.avg==null?-1:b.avg)-(a.avg==null?-1:a.avg));
+ const tr=rows.map(x=>{const p=x.avg==null?0:Math.round(x.avg/MAXC*100);return `<tr><td><b>${esc(x.r.no)}</b></td><td>${x.n}</td><td>${x.avg==null?'-':x.avg.toFixed(1)+' / '+MAXC}</td><td><div class="bar"><i style="width:${p}%"></i></div></td><td>${x.avg==null?'-':p+'%'}</td></tr>`}).join('')||'<tr><td colspan="5" class="empty">Belum ada nomor kamar. Tambahkan di ＋ Input Data → Kebersihan.</td></tr>';
+ const lt=ks.sort().reverse().slice(0,20).map(k=>{const q=k.split('|'),v=db.clean[k],miss=missList(v);
+  return `<tr><td>${q[0]}</td><td>${esc(roomNo(q[1]))}</td><td><b>${cscore(v.c)}/${MAXC}</b></td><td data-nt>${miss.length?esc(miss.join(', ')):'—'}</td><td>${esc(v.n||'')}</td></tr>`}).join('')||'<tr><td colspan="5" class="empty">Belum ada pemeriksaan.</td></tr>';
+ $('#view').innerHTML=`<h2>Kebersihan Kamar</h2>
+ <div class="card"><div class="g4"><label>Dari<input type="date" id="cf" value="${CL.from}"></label><label>Sampai<input type="date" id="ct" value="${CL.to}"></label></div></div>
+ <div class="tw"><table><tr><th>Kamar</th><th>Diperiksa</th><th>Rata-rata</th><th>Progres</th><th>%</th></tr>${tr}</table></div>
+ <h3>Pemeriksaan terbaru</h3>
+ <div class="tw"><table><tr><th>Tanggal</th><th>Kamar</th><th>Skor</th><th>Belum terpenuhi</th><th>Catatan</th></tr>${lt}</table></div>
+ <details class="card"><summary>Kriteria penilaian</summary><div class="tw" style="margin:10px 0 0" data-nt><table><tr><th>No.</th><th>Parameters</th><th>Indicators</th><th>V</th></tr>${CRIT.map((x,i)=>`<tr><td>${i+1}</td><td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td></tr>`).join('')}<tr><td colspan="3"><b>TOTAL</b></td><td><b>${MAXC}</b></td></tr></table></div></details>`;
+ $('#cf').onchange=e=>{CL.from=e.target.value;cleanPage()};$('#ct').onchange=e=>{CL.to=e.target.value;cleanPage()};
+}
+
+/* peringatan */
+function fPeringatan(){
+ const c=db.cfg||{};
+ $('#mb').innerHTML=`<div class="tip">Dashboard menandai siswa yang melewati batas ini. Kosongkan kolom untuk menonaktifkan.</div>
+ <div class="row"><label style="flex:1">Tandai jika total poin kurang dari atau sama dengan<input id="wp" type="number" step="1" placeholder="contoh: -5" value="${c.poin==null?'':c.poin}"></label></div>
+ <div class="row"><label style="flex:1">Tandai jika kartu kuning bulan ini sebanyak atau lebih dari<input id="wk" type="number" min="1" step="1" placeholder="contoh: 3" value="${c.kuning==null?'':c.kuning}"></label></div>
+ <div class="row"><button class="btn pri" id="wsv">Simpan</button></div>`;
+ $('#wsv').onclick=()=>{const a=$('#wp').value.trim(),b=$('#wk').value.trim();
+  setCfg(a===''||isNaN(+a)?null:parseInt(a,10),b===''||isNaN(+b)||+b<1?null:parseInt(b,10));toast('Pengaturan peringatan tersimpan')};
+}
+
+/* ---------- rekap ---------- */
+const R={per:LS('per')||'w2',off:0,from:'',to:'',kelas:'',act:''};
+let MD='';
+const Y={d:today(),a:''},ysh=(d,n)=>new Date(Date.UTC(+d.slice(0,4),+d.slice(5,7)-1,+d.slice(8,10)+n)).toISOString().slice(0,10);
+function stats(id,from,to,act){
+ const o={ok:0,Telat:0,Munfarid:0,Izin:0,Sakit:0,Alpa:0,tot:0};
+ for(const k in db.att){const p=k.split('|');if(p[2]!==id||p[0]<from||p[0]>to||(act&&p[1]!==act))continue;
+  const s=db.att[k].s;o.tot++;if(GOOD.includes(s))o.ok++;else if(s==='Telat'){o.ok++;o.Telat++}else if(o[s]!==undefined)o[s]++}
+ return o;
+}
+function rekap(){
+ if(R.per!=='custom')Object.assign(R,perRange(R.per,R.off));
+ const lbl=lbList(R.from,R.to),ln=lbl.length;
+ const lbr=lbl.map((x,i)=>{const y=i<10&&x.t<0,g=!y&&i>=Math.max(10,ln-20)&&x.t>0;return `<tr${y?' style="background:var(--kyb)"':g?' style="background:var(--hjb)"':''}><td>${y?'🟡 ':g?'🟢 ':''}${i+1}</td><td>${esc(x.s.nama)}</td><td>${esc(x.s.kelas)}</td><td>${x.y?'-'+x.y:'0'}</td><td>${x.g?'+'+x.g:'0'}</td><td><b>${fp(x.t)}</b></td></tr>`}).join('')||'<tr><td colspan="6" class="empty">No students yet.</td></tr>';
+ const lbh='<tr><th>#</th><th>Name</th><th>Class</th><th>Yellow</th><th>Green</th><th>Total</th></tr>';
+ $('#view').innerHTML=`<h2>Rekap</h2>
+ <div class="card"><div class="row"><label>Periode<select id="pp"><option value="w1">1 minggu</option><option value="w2">2 minggu</option><option value="m1">1 bulan</option><option value="all">Semua</option><option value="custom">Kustom</option></select></label>${R.per==='custom'||R.per==='all'?'':`<button class="btn" id="pprev">◀</button><button class="btn" id="pnext" ${R.off>=0?'disabled':''}>▶</button>`}${R.per==='w2'?`<label>Awal siklus 2 mingguan<input type="date" id="pan" value="${(db.cfg&&db.cfg.anchor)||'2026-01-05'}"></label>`:''}</div><div class="g4"><label>Dari<input type="date" id="f" value="${R.from}"></label><label>Sampai<input type="date" id="t" value="${R.to}"></label>
+ <label>Kelas<select id="k">${kelasOpts(R.kelas,true)}</select></label>
+ <label>Kegiatan<select id="a"><option value="">Semua</option>${ACTN().map(a=>`<option value="${a}" ${a===R.act?'selected':''}>${a}</option>`).join('')}</select></label></div>
+ <button class="btn pri" id="xl"><span>⬇ Unduh Excel</span></button></div>
+ 
+ <div><h3>🟨 Yellow Card per Hari</h3><div class="card"><div class="row"><button class="btn" id="ydp">◀</button><input type="date" id="yd" value="${Y.d}"><button class="btn" id="ydn">▶</button><button class="btn" id="ydt">Hari ini</button><label>Kegiatan<select id="ya"><option value="">Semua</option>${ACTN().map(a=>`<option value="${esc(a)}" ${a===Y.a?'selected':''}>${esc(a)}</option>`).join('')}</select></label></div><p class="mut" style="margin-top:6px">Pilih tanggal atau pakai ◀ ▶ untuk lihat hari lain. Mengikuti filter Kelas di atas.</p></div><div id="ycb">${ycHtml()}</div></div>
+  <div><h3>🏅 Leaderboard Yellow Card per Kategori</h3><p class="mut">Siswa dengan yellow card terbanyak di tiap kegiatan/kategori, 10 teratas. Periode ${R.from} → ${R.to}, mengikuti filter periode, kelas, dan kegiatan di atas.</p>${ycLb()}</div>
+  <div data-nt><h3>🏆 Leaderboard</h3><p class="mut">All students, sorted by total points (green − yellow) from the lowest (−) to the highest (+), for the period selected above (the class and activity filters do not apply). 🟡 = the 10 lowest (negative points). 🟢 = the 20 highest (positive points).</p>
+ <div class="tw"><table>${lbh}${lbr}</table></div></div>`;
+ $('#pp').value=R.per;
+ $('#pp').onchange=e=>{R.per=e.target.value;R.off=0;if(R.per!=='custom')LS('per',R.per);rekap()};
+ if($('#pprev')){$('#pprev').onclick=()=>{R.off--;rekap()};$('#pnext').onclick=()=>{R.off++;rekap()}}
+ if($('#pan'))$('#pan').onchange=e=>{if(e.target.value){setAnchor(e.target.value);R.off=0;rekap()}};
+ [['f','from'],['t','to'],['k','kelas'],['a','act']].forEach(([i,k])=>$('#'+i).onchange=e=>{if(k==='from'||k==='to')R.per='custom';R[k]=e.target.value;rekap()});
+ $('#xl').onclick=exportXlsx;
+ const yr=()=>{$('#ycb').innerHTML=ycHtml();$('#yd').value=Y.d};
+ $('#yd').onchange=e=>{if(e.target.value){Y.d=e.target.value;yr()}};
+ $('#ydp').onclick=()=>{Y.d=ysh(Y.d,-1);yr()};$('#ydn').onclick=()=>{Y.d=ysh(Y.d,1);yr()};$('#ydt').onclick=()=>{Y.d=today();yr()};
+ $('#ya').onchange=e=>{Y.a=e.target.value;yr()};
+}
+function ycHtml(){
+ const ids=new Set(db.students.filter(s=>!R.kelas||s.kelas===R.kelas).map(s=>s.id)),SM=new Map(db.students.map(s=>[s.id,s])),G=new Map();let tot=0;
+ db.cards.forEach(c=>{if(c.tipe!=='kuning'||!ids.has(c.sid)||c.tgl!==Y.d)return;
+  const s=SM.get(c.sid);if(!s)return;
+  let act='',st='',note=c.n||'';
+  if(c.auto||/^Auto · /.test(note)){const p=note.split(' · ');act=p[1]||'';st=p[2]||'';note=''}
+  if(Y.a&&act!==Y.a)return;
+  const key=(act?act+' — ':'')+(c.kat||'Lainnya');
+  if(!G.has(key))G.set(key,[]);
+  G.get(key).push({s,st,note,by:c.by||''});tot++});
+ const lbl=new Date(Y.d+'T00:00:00Z').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+ const head=`<p style="margin:6px 0"><b>${esc(lbl)}</b> <span class="mut">· ${tot} kartu</span></p>`;
+ if(!G.size)return head+'<p class="mut">Tidak ada yellow card di hari ini.</p>';
+ return head+[...G.entries()].sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0])).map(([k,l])=>{
+  l.sort((a,b)=>a.s.nama.localeCompare(b.s.nama));
+  const rows=l.map((x,i)=>`<div style="padding:7px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span class="mut" style="min-width:24px">${i+1}.</span><b>${esc(x.s.nama)}</b><span class="mut">${esc(x.s.kelas)}</span><span class="mut">${[x.st,x.note,x.by?'oleh '+x.by:''].filter(Boolean).map(esc).map(t=>'· '+t).join(' ')}</span></div>`).join('');
+  return `<details open class="tw" style="margin-bottom:10px"><summary style="cursor:pointer;padding:10px 12px;font-weight:600;background:var(--kyb);color:#92400e">🟨 ${esc(k)} <span class="mut" style="color:#b45309">· ${l.length} kartu</span></summary>${rows}</details>`}).join('');
+}
+function ycLb(){
+ const ids=new Set(db.students.filter(s=>!R.kelas||s.kelas===R.kelas).map(s=>s.id)),SM=new Map(db.students.map(s=>[s.id,s])),G=new Map();
+ db.cards.forEach(c=>{if(c.tipe!=='kuning'||!ids.has(c.sid)||c.tgl<R.from||c.tgl>R.to)return;
+  const s=SM.get(c.sid);if(!s)return;
+  let act='',note=c.n||'';
+  if(c.auto||/^Auto · /.test(note))act=note.split(' · ')[1]||'';
+  if(R.act&&act!==R.act)return;
+  const key=(act?act+' — ':'')+(c.kat||'Lainnya');
+  if(!G.has(key))G.set(key,new Map());
+  const m=G.get(key);m.set(c.sid,(m.get(c.sid)||0)+1)});
+ if(!G.size)return '<p class="mut">Tidak ada yellow card pada periode ini.</p>';
+ const tot=m=>[...m.values()].reduce((a,x)=>a+x,0);
+ return [...G.entries()].sort((a,b)=>tot(b[1])-tot(a[1])||a[0].localeCompare(b[0])).map(([k,m])=>{
+  const l=[...m.entries()].map(([id,n])=>({s:SM.get(id),n})).sort((a,b)=>b.n-a.n||a.s.nama.localeCompare(b.s.nama)),top=l.slice(0,10);
+  const rows=top.map((x,i)=>`<div style="padding:7px 12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:baseline"><span class="mut" style="min-width:24px">${i+1}.</span><b style="flex:1">${esc(x.s.nama)}</b><span class="mut">${esc(x.s.kelas)}</span><span class="pill y">${x.n}×</span></div>`).join('');
+  return `<details class="tw" style="margin-bottom:10px"${G.size<=3?' open':''}><summary style="cursor:pointer;padding:10px 12px;font-weight:600;background:var(--kyb);color:#92400e">🟨 ${esc(k)} <span class="mut" style="color:#b45309">· ${l.length} siswa · ${tot(m)} kartu</span></summary>${rows}${l.length>10?`<div class="mut" style="padding:6px 12px;border-top:1px solid var(--line)">+${l.length-10} siswa lainnya</div>`:''}</details>`}).join('');
+}
+function exportXlsx(){
+ if(typeof XLSX==='undefined'){toast('Library Excel belum termuat. Coba saat online.');return}
+ const ss=db.students.filter(s=>!R.kelas||s.kelas===R.kelas),ids=new Set(ss.map(s=>s.id));
+ const sum=[['Nama','Kelas','Kamar','Hadir','Telat','Izin','Sakit','Alpa','Total','% Hadir','Yellow Cards','Green Cards','Total Points','Nilai Kamar']];
+ ss.forEach(s=>{const o=stats(s.id,R.from,R.to,R.act),kc=cstat(s.id,R.from,R.to);sum.push([s.nama,s.kelas,s.kamar,o.ok,o.Telat,o.Izin,o.Sakit,o.Alpa,o.tot,o.tot?Math.round(o.ok/o.tot*100)/100:'',kc[0],kc[1],poin(s.id,R.from,R.to),(()=>{const q=roomStat(s.kamar,R.from,R.to);return q?Math.round(q.avg*10)/10:''})()]);});
+ const det=[['Tanggal','Kegiatan','Nama','Kelas','Kamar','Status','Catatan','Piket']];
+ Object.keys(db.att).sort().forEach(k=>{const p=k.split('|');if(!ids.has(p[2])||p[0]<R.from||p[0]>R.to||(R.act&&p[1]!==R.act))return;
+  const s=db.students.find(x=>x.id===p[2]),r=db.att[k];det.push([p[0],p[1],s.nama,s.kelas,s.kamar,r.s,r.n||'',r.by||pkTxt(p[0])]);});
+ const pik=[['Tanggal','Piket Pagi','Piket Malam']];Object.keys(db.piket).sort().forEach(d=>{if(d>=R.from&&d<=R.to)pik.push([d,pkv(d,0),pkv(d,1)])});
+ const wb=XLSX.utils.book_new(),w1=XLSX.utils.aoa_to_sheet(sum);
+ w1['!cols']=[{wch:22},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:12},{wch:12},{wch:12},{wch:12}];
+ for(let r=2;r<=sum.length;r++){const c=w1['J'+r];if(c&&c.v!=='')c.z='0%'}
+ const w2=XLSX.utils.aoa_to_sheet(det);w2['!cols']=[{wch:12},{wch:16},{wch:22},{wch:8},{wch:8},{wch:10},{wch:30},{wch:20}];
+ const w3=XLSX.utils.aoa_to_sheet(pik);w3['!cols']=[{wch:12},{wch:24},{wch:24}];
+ const krt=[['Date','Name','Class','Type','Category','Note','Supervisor','Points']];
+ db.cards.filter(c=>ids.has(c.sid)&&c.tgl>=R.from&&c.tgl<=R.to).sort((a,b)=>a.tgl.localeCompare(b.tgl)).forEach(c=>{const s=db.students.find(x=>x.id===c.sid);krt.push([c.tgl,s.nama,s.kelas,c.tipe==='kuning'?'Yellow':'Green',c.kat,c.n||'',c.by||'',pt(c)])});
+ const w4=XLSX.utils.aoa_to_sheet(krt);w4['!cols']=[{wch:12},{wch:22},{wch:8},{wch:8},{wch:24},{wch:30},{wch:20},{wch:8}];
+ XLSX.utils.book_append_sheet(wb,w1,'Rekap');XLSX.utils.book_append_sheet(wb,w2,'Detail');XLSX.utils.book_append_sheet(wb,w3,'Piket');XLSX.utils.book_append_sheet(wb,w4,'Cards');
+ XLSX.writeFile(wb,'rekap-asrama_'+R.from+'_'+R.to+'.xlsx');toast('File Excel diunduh');
+}
+
+/* ---------- monitoring siswa ---------- */
+const MPER={per:(['w1','w2','m1','all'].includes(LS('per'))?LS('per'):'w2'),off:0};
+function exportSiswa(s,f,t){
+ if(typeof XLSX==='undefined'){toast('Library Excel belum termuat. Coba saat online.');return}
+ const rr=roomOf(s.kamar),rsm=rr?roomStat(s.kamar,f,t):null;
+ const A1=[['Nama',s.nama],['Kelas',s.kelas],['Kamar',s.kamar||''],['Periode',f+' → '+t],['Nilai Kamar',rsm?Math.round(rsm.avg*10)/10:''],[],['Kegiatan','Hadir','Telat','Izin','Sakit','Alpa','Total']];
+ ACTN().forEach(a=>{const o=stats(s.id,f,t,a);A1.push([a,o.ok,o.Telat,o.Izin,o.Sakit,o.Alpa,o.tot])});
+ const cs=db.cards.filter(c=>c.sid===s.id&&c.tgl>=f&&c.tgl<=t).sort((a,b)=>a.tgl.localeCompare(b.tgl));
+ const K1=[['Date','Type','Category','Points','Note'],...cs.map(c=>[c.tgl,c.tipe==='kuning'?'Yellow':'Green',c.kat,pt(c),c.n||''])];
+ const wb=XLSX.utils.book_new(),W=(r,w)=>{const x=XLSX.utils.aoa_to_sheet(r);x['!cols']=w.map(n=>({wch:n}));return x};
+ XLSX.utils.book_append_sheet(wb,W(A1,[18,14,8,8,8,8,8]),'Rekap');XLSX.utils.book_append_sheet(wb,W(K1,[12,8,28,8,40]),'Cards');
+ XLSX.writeFile(wb,'rekap-'+s.nama.replace(/[^A-Za-z0-9]+/g,'_')+'_'+f+'_'+t+'.xlsx');toast('File Excel diunduh');
+}
+function monitor(){
+ if(!monSel||!db.students.some(s=>s.id===monSel))monSel=(db.students[0]||{}).id||'';
+ const s=db.students.find(x=>x.id===monSel),pr=perRange(MPER.per,MPER.off),f=pr.from,t=pr.to;
+ if(MD&&(MD<f||MD>t))MD='';
+ const inD=d=>!MD||d===MD;
+ let body='<div class="empty">Belum ada siswa.</div>';
+ if(s){
+  const per=ACTN().map(a=>{const o=stats(s.id,f,t,a),p=o.tot?Math.round(o.ok/o.tot*100):0;
+   return `<tr><td>${a}</td><td>${o.ok}/${o.tot}</td><td><div class="bar"><i style="width:${p}%"></i></div></td></tr>`}).join('');
+  const cs=db.cards.filter(c=>c.sid===s.id&&c.tgl>=f&&c.tgl<=t).sort((a,b)=>b.tgl.localeCompare(a.tgl)),ky=cs.filter(c=>c.tipe==='kuning').length;
+  const lr=lbRank(s.id,f,t),rr=roomOf(s.kamar),rsm=rr?roomStat(s.kamar,f,t):null;
+  const roomHtml='<h3>Nilai kamar</h3>'+(rr?`<div class="g3"><div class="card"><div class="big" style="font-size:1.1rem;padding:.3rem 0">${esc(rr.no)}</div><div class="mut">Kamar</div></div><div class="card"><div class="big">${rsm?rsm.avg.toFixed(1):'-'}</div><div class="mut">Rata-rata nilai kamar</div></div><div class="card"><div class="big">${rsm?rsm.last+'/'+MAXC:'-'}</div><div class="mut">Pemeriksaan terakhir</div></div></div>`:'<div class="bn">Nomor kamar siswa belum terdaftar di daftar kamar (Input Data → Kebersihan).</div>');
+  const AN=ACTN(),lk=Object.keys(db.att).filter(k=>{const q=k.split('|');return q[2]===s.id&&q[0]>=f&&q[0]<=t&&inD(q[0])}).sort((x,y)=>{const p=x.split('|'),q=y.split('|');return q[0].localeCompare(p[0])||AN.indexOf(p[1])-AN.indexOf(q[1])}),lnum=lk.length;
+  const last=lk.map(k=>{const q=k.split('|'),r=db.att[k];
+   return `<tr><td>${q[0]}</td><td>${q[1]}</td><td>${r.s}</td><td>${esc(r.n||'')}</td><td><button class="btn" data-maedit="${esc(q[0]+'|'+q[1])}">Edit</button></td></tr>`}).join('');
+  body=`${lr?`<div class="bn ${lr.k==='low'?'yel':'ok'}" data-nt>${lr.k==='low'?'🟡 <b>Top 10 · lowest points</b> · this period':'🟢 <b>Top 20 · highest points</b> · this period'}</div>`:''}
+  <div class="card"><div class="nm" style="font-size:1rem">${esc(s.nama)}</div><div class="mut">Kelas ${esc(s.kelas)} · Kamar ${esc(s.kamar||'-')}</div></div>
+  <div class="tw"><table><tr><th>Kegiatan</th><th>Hadir</th><th>Progres</th></tr>${per}</table></div>
+  ${roomHtml}
+  <div data-nt><h3>Cards</h3>
+  <div class="g3"><div class="card ky"><div class="big">${ky}</div><div class="mut">🟨 Yellow Card</div></div><div class="card hj"><div class="big">${cs.length-ky}</div><div class="mut">🟩 Green Card</div></div><div class="card"><div class="big">${fp(poin(s.id,f,t))}</div><div class="mut">Total points</div></div></div>
+  <div class="tw"><table><tr><th>Date</th><th>Type</th><th>Category</th><th>Points</th><th>Note</th><th></th></tr>${cs.filter(c=>inD(c.tgl)).map(c=>`<tr><td>${c.tgl}</td><td>${jenis(c.tipe)}</td><td>${esc(c.kat)}</td><td>${fp(pt(c))}</td><td>${esc(c.n||'')}</td><td>${String(c.id).startsWith('auto|')?'<span class="mut">Auto</span>':`<button class="btn" data-mkedit="${esc(c.id)}">Edit</button>`}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No cards yet.</td></tr>'}</table></div></div>
+  <h3>Catatan ${MD?'tanggal '+esc(MD):'periode ini'} · ${lnum} catatan</h3>
+  <div class="tw"><table><tr><th>Tanggal</th><th>Kegiatan</th><th>Status</th><th>Catatan</th><th></th></tr>${last||'<tr><td colspan="5" class="empty">Belum ada catatan.</td></tr>'}</table></div>`;
+ }
+ $('#view').innerHTML=`<h2>Monitoring Siswa</h2><div class="row"><label>Pilih Siswa<select id="s" style="min-width:200px">${db.students.map(x=>`<option value="${x.id}" ${x.id===monSel?'selected':''}>${esc(x.nama)} (${esc(x.kelas)})</option>`).join('')}</select></label>
+ <label>Periode<select id="mp"><option value="w1">1 minggu</option><option value="w2">2 minggu</option><option value="m1">1 bulan</option><option value="all">Semua</option></select></label>${MPER.per==='all'?'':`<button class="btn" id="mprev">◀</button><button class="btn" id="mnext" ${MPER.off>=0?'disabled':''}>▶</button>`}<label>Tanggal<input type="date" id="md" value="${MD}"${MPER.per==='all'?'':` min="${f}" max="${t}"`}></label>${MD?'<button class="btn sec" id="mdx">Semua tanggal</button>':''}</div>
+ <p class="mut"><b>Rekap per siswa</b> · ${f} → ${t}</p>${s?'<div class="row"><button class="btn sec" id="msx">⬇ Unduh rekap siswa (Excel)</button></div>':''}${body}`;
+ const sel=$('#s');if(sel)sel.onchange=e=>{monSel=e.target.value;monitor()};
+ $('#mp').value=MPER.per;$('#mp').onchange=e=>{MPER.per=e.target.value;MPER.off=0;LS('per',MPER.per);monitor()};
+ if($('#mprev')){$('#mprev').onclick=()=>{MPER.off--;monitor()};$('#mnext').onclick=()=>{MPER.off++;monitor()}}
+ $('#md').onchange=e=>{MD=e.target.value||'';monitor()};if($('#mdx'))$('#mdx').onclick=()=>{MD='';monitor()};
+ if($('#msx'))$('#msx').onclick=()=>exportSiswa(s,f,t);
+ $('#view').querySelectorAll('[data-maedit]').forEach(b=>b.onclick=()=>{const q=b.dataset.maedit.split('|');A.date=q[0];A.act=q[1];A.kelas=s.kelas;loadDraft();openM('Absensi')});
+ $('#view').querySelectorAll('[data-mkedit]').forEach(b=>b.onclick=()=>{K.edit=b.dataset.mkedit;K.f=s.id;openM('Kartu')});
+}
+
+/* ---------- mulai ---------- */
+function boot(){db.students.sort(stuCmp);normAll();$('#out').hidden=false;$('#fab').hidden=false;setSt();go();pull()}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+addEventListener('online',()=>{online=true;pull()});
+addEventListener('offline',()=>{online=false;setSt()});
+setInterval(pull,30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
+renderFooter();document.documentElement.lang=lang;document.title=tx('Monitoring Asrama');applyAll();
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(trNode))).observe(document.body,{childList:true,subtree:true});
+if(code)boot();else showLogin('');
+</script>
+</body>
+</html>
