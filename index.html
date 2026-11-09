@@ -43,6 +43,7 @@ h2{margin:4px 0 10px;font-size:1.125rem}h3{margin:14px 0 8px;font-size:.9rem}.h2
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.g3 .card{margin:0;padding:12px}
 .g4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}@media(min-width:768px){.g4{grid-template-columns:repeat(4,1fr)}}
 .big{font-size:1.5rem;font-weight:700}.g3 .mut{font-size:11px}
+.bkw{border-left:4px solid #f59e0b;background:#fffbeb;color:#92400e;padding:12px 14px;border-radius:0 12px 12px 0;font-size:12px;margin-bottom:12px}.bkw b{display:block;font-size:13px;margin-bottom:6px}.bkw .btn{margin-top:4px}
 .bn,.tip{border-left:4px solid var(--pri);background:var(--soft);color:#1e3a8a;padding:12px 14px;border-radius:0 12px 12px 0;font-size:12px;margin-bottom:12px}
 .bn.red{border-color:var(--bad);background:#fff1f2;color:#9f1239}.bn.ok{border-color:var(--hj);background:var(--hjb);color:#065f46}
 .tw{background:#fff;border:1px solid var(--line);border-radius:12px;overflow-x:auto;margin-bottom:12px}
@@ -346,6 +347,8 @@ setInterval(tickClock,1000);
 function go(){if(!code)return;nav();({'Dashboard':dash,'Rekap':rekap,'Monitoring Siswa':monitor,'Kebersihan':cleanPage})[tab]()}
 
 /* ---------- dashboard ---------- */
+function bkDays(){const b=LS('bk');if(!b)return null;const p=String(b).split('-').map(Number);if(p.length!==3||p.some(isNaN))return null;const a=new Date(p[0],p[1]-1,p[2]),t=new Date();return Math.floor((new Date(t.getFullYear(),t.getMonth(),t.getDate())-a)/864e5)}
+function bkBanner(){const n=bkDays();if(n!==null&&n<7)return '';return `<div class="bkw"><b>⚠ Waktunya cadangkan data</b>${n===null?'Data belum pernah dicadangkan di perangkat ini.':'Cadangan terakhir '+(n<=0?'hari ini':n+' hari lalu')+'.'} Disarankan sekali seminggu agar data aman.<br><button class="btn pri" id="bkn">⬇ Cadangkan sekarang</button></div>`}
 function dash(){
  const d=today(),n=db.students.length,ym=d.slice(0,7);
  const SEV={Alpa:0,Sakit:1,Izin:2,Telat:3},SO=window.SO=window.SO||{},sdv=window.SD||d;
@@ -376,24 +379,24 @@ function dash(){
  const topN=(lb,k,n)=>lb.filter(x=>x[k]>0).sort((p,q)=>q[k]-p[k]||p.s.nama.localeCompare(q.s.nama)).slice(0,n).map(x=>esc(x.s.nama)+' ('+x[k]+')').join(', ')||'-';
  const hist=[];for(let o=-1;o>=-12;o--){const pr=perRange('w2',o);if(pr.to<oldest)break;const lb=lbAll(pr.from,pr.to);hist.push(`<tr><td>${fdt(pr.from)} – ${fdt(pr.to)}</td><td>${topN(lb,'g',3)}</td><td>${topN(lb,'y',3)}</td></tr>`)}
  const histH=`<details class="card"><summary><b>Riwayat juara tiap siklus</b></summary>${hist.length?`<div class="tw" style="margin:10px 0 0"><table><tr><th>Periode</th><th>🟩 Hijau teratas</th><th>🟨 Kuning teratas</th></tr>${hist.join('')}</table></div>`:'<div class="bn" style="margin:10px 0 0">Belum ada riwayat siklus.</div>'}</details>`;
- const rankH=`<h3>Peringkat Kartu (2 Minggu)</h3><div class="row" style="align-items:center;margin:0 0 8px;gap:8px"><button class="btn sec" id="rkp"${cy.from<=oldest?' disabled':''}>◀</button><div style="flex:1;text-align:center"><b>${fdt(cy.from)} – ${fdt(cy.to)}</b><div class="mut">${RO===0?'Siklus ini':'Siklus sebelumnya'}</div></div><button class="btn sec" id="rkn"${RO>=0?' disabled':''}>▶</button></div>
+ const rankH=`<div class="row" style="align-items:center;margin:0 0 8px;gap:8px"><button class="btn sec" id="rkp"${cy.from<=oldest?' disabled':''}>◀</button><div style="flex:1;text-align:center"><b>${fdt(cy.from)} – ${fdt(cy.to)}</b><div class="mut">${RO===0?'Siklus ini':'Siklus sebelumnya'}</div></div><button class="btn sec" id="rkn"${RO>=0?' disabled':''}>▶</button></div>
  <h3>🟨 5 Kartu Kuning Terbanyak</h3>${rk('y')}<h3>🟩 5 Kartu Hijau Terbanyak</h3>${rk('g')}<h3>🏆 5 Poin Terbanyak (Hijau − Kuning)</h3>${rkT()}
  ${histH}
  <p class="mut">Periode 2 minggu diatur di Rekap → Awal siklus 2 mingguan.</p>`;
  const hs=Object.keys(db.clean).filter(k=>k.startsWith(d+'|')).map(k=>({id:k.split('|')[1],v:cscore(db.clean[k].c)})),havg=hs.length?hs.reduce((a,x)=>a+x.v,0)/hs.length:null,low=hs.length?hs.reduce((m,x)=>x.v<m.v?x:m):null;
- $('#view').innerHTML=`${hlH}<div class="rt"><div><p class="sm">Tanggal Real-Time</p><h2 id="rtd">…</h2></div><div class="rtr"><p class="sm">Waktu Live</p><p class="clock" id="rtc">00:00:00 WIB</p></div></div>
+ $('#view').innerHTML=`${bkBanner()}${hlH}<div class="rt"><div><p class="sm">Tanggal Real-Time</p><h2 id="rtd">…</h2></div><div class="rtr"><p class="sm">Waktu Live</p><p class="clock" id="rtc">00:00:00 WIB</p></div></div>
  <div class="card"><div class="g2"><div><p class="mut">Piket Pagi</p><h2 class="h2s">${esc(pkv(d,0)||'Belum diisi')}</h2></div><div><p class="mut">Piket Malam</p><h2 class="h2s">${esc(pkv(d,1)||'Belum diisi')}</h2></div></div></div>
  <h3>Summary harian</h3>
  <div class="row" style="margin:0 0 8px;align-items:center;gap:8px"><input type="date" id="sd" value="${sdv}" max="${d}" style="flex:1">${sdv!==d?'<button class="btn sec" id="sdt">Hari ini</button>':''}</div>
  ${sumH}
  <h3>Kebersihan kamar hari ini</h3>
  <div class="g3"><div class="card"><div class="big">${hs.length}/${db.rooms.length}</div><div class="mut">Kamar diperiksa hari ini</div></div><div class="card"><div class="big">${havg==null?'-':havg.toFixed(1)}</div><div class="mut">Rata-rata skor hari ini</div></div><div class="card"><div class="big" style="font-size:1.05rem;padding:.3rem 0">${low?esc(roomNo(low.id))+' · '+low.v+'/'+MAXC:'-'}</div><div class="mut">Skor terendah hari ini</div></div></div>
- ${rankH}
- <div data-nt><h3>Cards this month</h3>
+ <details class="card" data-sa="sec|rank"${SO['sec|rank']?' open':''}><summary><b>Peringkat Kartu (2 Minggu)</b></summary>${rankH}</details>
+ <details class="card" data-nt data-sa="sec|bulan"${SO['sec|bulan']?' open':''}><summary><b>Cards this month</b></summary><div>
  <div class="g3"><div class="card ky"><div class="big">${ky}</div><div class="mut">🟨 Yellow Card</div></div><div class="card hj"><div class="big">${cm.length-ky}</div><div class="mut">🟩 Green Card</div></div><div class="card"><div class="big">${fp(mp)}</div><div class="mut">Total points this month</div></div></div>
- <div class="tw"><table><tr><th>Category</th><th>Type</th><th>This month</th></tr>${crow}</table></div></div>
+ <div class="tw"><table><tr><th>Category</th><th>Type</th><th>This month</th></tr>${crow}</table></div></div></details>
  <div class="card"><h3 style="margin-top:0">Cadangan data</h3><button class="btn sec" id="bk"><span>⬇ Cadangkan semua data (Excel)</span></button><p class="mut" style="margin:8px 0 0">Cadangan terakhir di perangkat ini: ${esc(LS('bk')||'belum pernah')}. Disarankan sekali seminggu.</p></div>`;
- $('#bk').onclick=backup;$('#sd').onchange=()=>{const v=$('#sd').value;window.SD=v&&v<d?v:null;dash()};if($('#sdt'))$('#sdt').onclick=()=>{window.SD=null;dash()};$('#rkp').onclick=()=>{window.RO=RO-1;dash()};$('#rkn').onclick=()=>{window.RO=Math.min(0,RO+1);dash()};$('#view').querySelectorAll('details[data-sa]').forEach(e=>e.ontoggle=()=>{SO[e.dataset.sa]=e.open});tickClock();
+ $('#bk').onclick=backup;if($('#bkn'))$('#bkn').onclick=backup;$('#sd').onchange=()=>{const v=$('#sd').value;window.SD=v&&v<d?v:null;dash()};if($('#sdt'))$('#sdt').onclick=()=>{window.SD=null;dash()};$('#rkp').onclick=()=>{window.RO=RO-1;dash()};$('#rkn').onclick=()=>{window.RO=Math.min(0,RO+1);dash()};$('#view').querySelectorAll('details[data-sa]').forEach(e=>e.ontoggle=()=>{SO[e.dataset.sa]=e.open});tickClock();
 }
 
 /* ---------- popup input data ---------- */
