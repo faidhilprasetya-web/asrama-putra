@@ -142,6 +142,9 @@ const APP_VER='1.0';
 const LANGS={id:'Indonesia',en:'English',tr:'Türkçe'};
 let lang=LS('lang');if(!LANGS[lang])lang='en';
 const D=new Map([
+["Rincian ketidakhadiran",["Absence details","Devamsızlık ayrıntıları"]],
+["Kegiatan (tanggal)",["Activity (dates)","Etkinlik (tarihler)"]],
+["Jumlah",["Count","Adet"]],
 ["Telat di",["Late in","Geç kalınan"]],
 ["Izin di",["Excused in","İzinli olunan"]],
 ["Sakit di",["Sick in","Hasta olunan"]],
@@ -829,6 +832,8 @@ function monitor(){
  if(s){
   const per=ACTN().map(a=>{const o=stats(s.id,f,t,a),p=o.tot?Math.round(o.ok/o.tot*100):0;
    return `<tr><td>${a}</td><td>${o.ok}/${o.tot}</td><td><div class="bar"><i style="width:${p}%"></i></div></td></tr>`}).join('');
+  const so=stats(s.id,f,t),absRows=['Alpa','Izin','Sakit','Telat'].filter(st=>so[st]).map(st=>`<tr><td><b>${st}</b></td><td>${so[st]}</td><td>${esc(statWhere(s.id,f,t,'',st))}</td></tr>`).join('');
+  const absHtml=absRows?`<div class="tw"><table><tr><th>Status</th><th>Jumlah</th><th>Kegiatan (tanggal)</th></tr>${absRows}</table></div>`:'<div class="bn ok">Tidak ada yang telat, sakit, izin, atau alpa.</div>';
   const cs=db.cards.filter(c=>c.sid===s.id&&c.tgl>=f&&c.tgl<=t).sort((a,b)=>b.tgl.localeCompare(a.tgl)),ky=cs.filter(c=>c.tipe==='kuning').length;
   const lr=lbRank(s.id,f,t),rr=roomOf(s.kamar),rsm=rr?roomStat(s.kamar,f,t):null;
   const roomHtml='<h3>Nilai kamar</h3>'+(rr?`<div class="g3"><div class="card"><div class="big" style="font-size:1.1rem;padding:.3rem 0">${esc(rr.no)}</div><div class="mut">Kamar</div></div><div class="card"><div class="big">${rsm?rsm.avg.toFixed(1):'-'}</div><div class="mut">Rata-rata nilai kamar</div></div><div class="card"><div class="big">${rsm?rsm.last+'/'+MAXC:'-'}</div><div class="mut">Pemeriksaan terakhir</div></div></div>`:'<div class="bn">Nomor kamar siswa belum terdaftar di daftar kamar (Input Data → Kebersihan).</div>');
@@ -838,6 +843,7 @@ function monitor(){
   body=`${lr?`<div class="bn ${lr.k==='low'?'yel':'ok'}" data-nt>${lr.k==='low'?'🟡 <b>Top 10 · lowest points</b> · this period':'🟢 <b>Top 20 · highest points</b> · this period'}</div>`:''}
   <div class="card"><div class="nm" style="font-size:1rem">${esc(s.nama)}</div><div class="mut">Kelas ${esc(s.kelas)} · Kamar ${esc(s.kamar||'-')}</div></div>
   <div class="tw"><table><tr><th>Kegiatan</th><th>Hadir</th><th>Progres</th></tr>${per}</table></div>
+  <h3>Rincian ketidakhadiran</h3>${absHtml}
   ${roomHtml}
   <div data-nt><h3>Cards</h3>
   <div class="g3"><div class="card ky"><div class="big">${ky}</div><div class="mut">🟨 Yellow Card</div></div><div class="card hj"><div class="big">${cs.length-ky}</div><div class="mut">🟩 Green Card</div></div><div class="card"><div class="big">${fp(poin(s.id,f,t))}</div><div class="mut">Total points</div></div></div>
